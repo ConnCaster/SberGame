@@ -1,11 +1,16 @@
 #ifndef SBERGAME_ISPECACTION_H
 #define SBERGAME_ISPECACTION_H
 
-#include "interfaces/IAction.h"
+#include <vector>
 
-class ISpecAction: public IAction {
+#include "interfaces/IUnit.h"
+
+class ISpecAction {
 public:
-    virtual void DoAction() = 0;
+    virtual void DoSpecAction() {};
+    virtual void DoSpecAction(IUnit* target) = 0;
+    virtual void DoSpecAction(std::vector<IUnit*>& targets) {};
+    virtual ~ISpecAction() = default;
 };
 
 #endif //SBERGAME_ISPECACTION_H
