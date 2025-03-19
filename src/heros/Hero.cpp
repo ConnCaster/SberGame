@@ -4,10 +4,18 @@ constexpr static unsigned int kMaxHealth = 100;
 constexpr static unsigned int kMaxProtection = 10;
 constexpr static unsigned int kMaxDamage = 20;
 
+constexpr static bool kIsHillable = true;
+constexpr static bool kIsClonable = true;
+
 Hero::Hero()
-    : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+    : IUnit(kMaxHealth, kMaxProtection, kMaxDamage,  kIsHillable,kIsClonable),
     attack_{nullptr}
 {}
+
+//IUnit* Hero::Clone() {
+//    return nullptr;
+//}
+
 
 void Hero::DecreaseHealth(unsigned int damage) {
     if (damage >= health_ + protection_) {

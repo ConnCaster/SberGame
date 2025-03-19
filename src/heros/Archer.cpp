@@ -4,10 +4,13 @@ constexpr static unsigned int kMaxHealth = 70;
 constexpr static unsigned int kMaxProtection = 10;
 constexpr static unsigned int kMaxDamage = 20;
 
+constexpr static bool kIsHillable = true;
+constexpr static bool kIsClonable = true;
+
 constexpr static unsigned int kDistance = 2;
 
 Archer::Archer()
-        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage, kIsHillable, kIsClonable),
         distance_{kDistance},
         attack_{nullptr}
 {}

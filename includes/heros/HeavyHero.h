@@ -13,11 +13,14 @@ public:
     ~HeavyHero() override = default;
 
     void DecreaseHealth(unsigned int damage) override;
-    inline bool IsHillable() const override { return false; };
 
     // атака и спецвозможности ...
     void SetAttack(std::unique_ptr<IAttack> attack);
     void PerformAttack(IUnit *target);
+
+private:
+    IUnit* Clone() override {};
+    void IncreaseHealth(unsigned int additional_health) override {};
 
 private:
     std::unique_ptr<IAttack> attack_;

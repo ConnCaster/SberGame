@@ -8,7 +8,7 @@
 class ISpecAction {
 public:
     virtual void DoSpecAction() {};
-    virtual void DoSpecAction(IUnit* target) = 0;
+    virtual void DoSpecAction(IUnit* target) {};
     virtual void DoSpecAction(std::vector<IUnit*>& targets) {};
     virtual ~ISpecAction() = default;
 };

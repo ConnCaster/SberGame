@@ -4,8 +4,11 @@ constexpr static unsigned int kMaxHealth = 150;
 constexpr static unsigned int kMaxProtection = 15;
 constexpr static unsigned int kMaxDamage = 25;
 
+constexpr static bool kIsHillable = false;
+constexpr static bool kIsClonable = false;
+
 HeavyHero::HeavyHero()
-        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage, kIsHillable, kIsClonable),
         attack_{nullptr}
 {}
 

@@ -12,8 +12,10 @@ list(APPEND ${PROJECT_NAME}_HEADERS
         includes/heros/Hero.h
         includes/heros/Archer.h
         includes/heros/Hiller.h
+        includes/heros/Wizard.h
 
         includes/spec_actions/HillSpecAction.h
+        includes/spec_actions/CloneSpecAction.h
 
         includes/attaks/NormalAttack.h
 )
@@ -24,8 +26,10 @@ list(APPEND ${PROJECT_NAME}_SOURCES
         src/heros/Hero.cpp
         src/heros/Archer.cpp
         src/heros/Hiller.cpp
+        src/heros/Wizard.cpp
 
         src/spec_actions/HillSpecAction.cpp
+        src/spec_actions/CloneSpecAction.cpp
 
         src/attacks/NormalAttack.cpp
         )

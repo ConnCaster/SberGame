@@ -1,37 +1,32 @@
-#ifndef SBERGAME_HILLER_H
-#define SBERGAME_HILLER_H
+#ifndef SBERGAME_WIZARD_H
+#define SBERGAME_WIZARD_H
 
 #include <iostream>
 #include <memory>
 
-#include "interfaces/IAttack.h"
 #include "interfaces/ISpecAction.h"
 #include "interfaces/IUnit.h"
 
-class Hiller : public IUnit {
+class Wizard : public IUnit {
 public:
-    Hiller();
-    ~Hiller() override = default;
-
-    IUnit* Clone() override { return new Hiller{}; };
+    Wizard();
+    ~Wizard() override = default;
 
     void DecreaseHealth(unsigned int damage) override;
 
     // атака и спецвозможности ...
-    void SetAttack(std::unique_ptr<IAttack> attack);
     void SetSpecAction(std::unique_ptr<ISpecAction> spec_action);
-    void PerformAttack(IUnit *target);
-    void PerformSpecAction(IUnit *target);
+    IUnit* PerformSpecAction(IUnit *target);
 
 private:
+    IUnit* Clone() override {};
     void IncreaseHealth(unsigned int additional_health) override {};
 
 private:
-//    unsigned int power_;
     unsigned int distance_;
 
-    std::unique_ptr<IAttack> attack_;
     std::unique_ptr<ISpecAction> spec_action_;
 };
 
-#endif //SBERGAME_HILLER_H
+
+#endif //SBERGAME_WIZARD_H

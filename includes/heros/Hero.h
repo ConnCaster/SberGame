@@ -12,8 +12,9 @@ public:
     Hero();
     ~Hero() override = default;
 
+    IUnit* Clone() override { return new Hero{}; };
+
     void DecreaseHealth(unsigned int damage) override;
-    inline bool IsHillable() const override { return true; };
     void IncreaseHealth(unsigned int additional_health) override;
 
     // атака и спецвозможности ...

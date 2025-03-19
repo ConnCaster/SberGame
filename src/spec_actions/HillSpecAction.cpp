@@ -6,7 +6,7 @@ HillSpecAction::HillSpecAction(unsigned int hill_power)
 {}
 
 void HillSpecAction::DoSpecAction(IUnit *target) {
-    if(target->IsHillable()) {
+    if(target->GetIsHillable()) {
         target->IncreaseHealth(rand()%max_hill_power_);
     }
 }
