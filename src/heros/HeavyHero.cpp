@@ -1,16 +1,14 @@
 #include "heros/HeavyHero.h"
 
-constexpr static unsigned int kHealth = 150;
-constexpr static unsigned int kProtection = 15;
-constexpr static unsigned int kDamage = 25;
+constexpr static unsigned int kMaxHealth = 150;
+constexpr static unsigned int kMaxProtection = 15;
+constexpr static unsigned int kMaxDamage = 25;
 
 HeavyHero::HeavyHero()
-        : IUnit(kHealth, kProtection, kDamage), attack_{nullptr}
+        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+        attack_{nullptr}
 {}
 
-HeavyHero::HeavyHero(unsigned int health, unsigned int protection, unsigned int damage)
-    : IUnit(health, protection, damage), attack_{nullptr}
-{}
 
 void HeavyHero::DecreaseHealth(unsigned int damage) {
     if (damage >= health_ + protection_) {
@@ -28,7 +26,11 @@ void HeavyHero::DecreaseHealth(unsigned int damage) {
 }
 
 void HeavyHero::SetAttack(std::unique_ptr<IAttack> attack) {
-    attack_ = std::move(attack);
+    if (attack_ != nullptr) {
+        attack_.reset(attack.get());
+    } else {
+        attack_ = std::move(attack);
+    }
 }
 
 void HeavyHero::PerformAttack(IUnit *target) {

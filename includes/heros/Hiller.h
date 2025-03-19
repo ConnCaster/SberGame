@@ -11,8 +11,6 @@
 class Hiller : public IUnit {
 public:
     Hiller();
-    Hiller(unsigned int health, unsigned int protection, unsigned int damage, unsigned int distance);
-
     ~Hiller() override = default;
 
     void DecreaseHealth(unsigned int damage) override;

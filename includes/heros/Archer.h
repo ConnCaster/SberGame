@@ -10,7 +10,6 @@
 class Archer : public IUnit {
 public:
     Archer();
-    Archer(unsigned int health, unsigned int protection, unsigned int damage, unsigned int distance);
     ~Archer() override = default;
 
     void DecreaseHealth(unsigned int damage) override;

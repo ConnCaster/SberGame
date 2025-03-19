@@ -10,8 +10,6 @@
 class Hero : public IUnit {
 public:
     Hero();
-    Hero(unsigned int health, unsigned int protection, unsigned int damage);
-
     ~Hero() override = default;
 
     void DecreaseHealth(unsigned int damage) override;

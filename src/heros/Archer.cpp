@@ -1,17 +1,15 @@
 #include "heros/Archer.h"
 
-constexpr static unsigned int kHealth = 70;
-constexpr static unsigned int kProtection = 10;
-constexpr static unsigned int kDamage = 20;
+constexpr static unsigned int kMaxHealth = 70;
+constexpr static unsigned int kMaxProtection = 10;
+constexpr static unsigned int kMaxDamage = 20;
 
 constexpr static unsigned int kDistance = 2;
 
 Archer::Archer()
-        : IUnit(kHealth, kProtection, kDamage), distance_{kDistance}, attack_{nullptr}
-{}
-
-Archer::Archer(unsigned int health, unsigned int protection, unsigned int damage, unsigned int distance)
-        : IUnit(health, protection, damage), distance_{distance}, attack_{nullptr}
+        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+        distance_{kDistance},
+        attack_{nullptr}
 {}
 
 void Archer::DecreaseHealth(unsigned int damage) {
@@ -29,11 +27,15 @@ void Archer::DecreaseHealth(unsigned int damage) {
     }
 }
 void Archer::SetAttack(std::unique_ptr<IAttack> attack) {
-    attack_ = std::move(attack);
+    if (attack_ != nullptr) {
+        attack_.reset(attack.get());
+    } else {
+        attack_ = std::move(attack);
+    }
 }
 
 void Archer::IncreaseHealth(unsigned int additional_health) {
-    health_ = (health_ + additional_health > kHealth) ? kHealth : health_ + additional_health;
+    health_ = (health_ + additional_health > kMaxHealth) ? kMaxHealth : health_ + additional_health;
 }
 
 void Archer::PerformAttack(IUnit *target) {

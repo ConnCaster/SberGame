@@ -1,15 +1,12 @@
 #include "heros/Hero.h"
 
-constexpr static unsigned int kHealth = 100;
-constexpr static unsigned int kProtection = 10;
-constexpr static unsigned int kDamage = 20;
+constexpr static unsigned int kMaxHealth = 100;
+constexpr static unsigned int kMaxProtection = 10;
+constexpr static unsigned int kMaxDamage = 20;
 
 Hero::Hero()
-    : IUnit(kHealth, kProtection, kDamage), attack_{nullptr}
-{}
-
-Hero::Hero(unsigned int health, unsigned int protection, unsigned int damage)
-        : IUnit(health, protection, damage), attack_{nullptr}
+    : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+    attack_{nullptr}
 {}
 
 void Hero::DecreaseHealth(unsigned int damage) {
@@ -28,11 +25,15 @@ void Hero::DecreaseHealth(unsigned int damage) {
 }
 
 void Hero::SetAttack(std::unique_ptr<IAttack> attack) {
-    attack_ = std::move(attack);
+    if (attack_ != nullptr) {
+        attack_.reset(attack.get());
+    } else {
+        attack_ = std::move(attack);
+    }
 }
 
 void Hero::IncreaseHealth(unsigned int additional_health) {
-    health_ = (health_ + additional_health > kHealth) ? kHealth : health_ + additional_health;
+    health_ = (health_ + additional_health > kMaxHealth) ? kMaxHealth : health_ + additional_health;
 }
 
 void Hero::PerformAttack(IUnit *target) {

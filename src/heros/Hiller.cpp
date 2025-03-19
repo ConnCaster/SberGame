@@ -1,18 +1,20 @@
 #include "heros/Hiller.h"
 
-constexpr static unsigned int kHealth = 70;
-constexpr static unsigned int kProtection = 10;
-constexpr static unsigned int kDamage = 20;
+#include "attacks/NormalAttack.h"
+#include "spec_actions/HillSpecAction.h"
+
+constexpr static unsigned int kMaxHealth = 70;
+constexpr static unsigned int kMaxProtection = 10;
+constexpr static unsigned int kMaxDamage = 20;
 
 constexpr static unsigned int kDistance = 2;
 constexpr static unsigned int kMaxPower = 30;
 
 Hiller::Hiller()
-        : IUnit(kHealth, kProtection, kDamage), distance_{kDistance}, attack_{nullptr}, spec_action_{nullptr}
-{}
-
-Hiller::Hiller(unsigned int health, unsigned int protection, unsigned int damage, unsigned int distance)
-        : IUnit(health, protection, damage), distance_{distance}, attack_{nullptr}, spec_action_{nullptr}
+        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+        distance_{kDistance},
+        attack_{std::make_unique<NormalAttack>()},
+        spec_action_{std::make_unique<HillSpecAction>(kMaxPower)}
 {}
 
 void Hiller::DecreaseHealth(unsigned int damage) {
@@ -31,11 +33,19 @@ void Hiller::DecreaseHealth(unsigned int damage) {
 }
 
 void Hiller::SetAttack(std::unique_ptr<IAttack> attack) {
-    attack_ = std::move(attack);
+    if (attack_ != nullptr) {
+        attack_.reset(attack.get());
+    } else {
+        attack_ = std::move(attack);
+    }
 }
 
 void Hiller::SetSpecAction(std::unique_ptr<ISpecAction> spec_action) {
-    spec_action_ = std::move(spec_action);
+    if (spec_action_ != nullptr) {
+        spec_action_.reset(spec_action.get());
+    } else {
+        spec_action_ = std::move(spec_action);
+    }
 }
 
 void Hiller::PerformAttack(IUnit *target) {
