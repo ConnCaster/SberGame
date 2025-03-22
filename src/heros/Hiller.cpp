@@ -1,5 +1,6 @@
-#include "heros/Hiller.h"
+#include <iostream>
 
+#include "heros/Hiller.h"
 #include "attacks/NormalAttack.h"
 #include "spec_actions/HillSpecAction.h"
 
@@ -16,6 +17,18 @@ Hiller::Hiller()
         attack_{std::make_unique<NormalAttack>()},
         spec_action_{std::make_unique<HillSpecAction>(kMaxPower)}
 {}
+
+Hiller::Hiller(const Hiller& other)
+    : IUnit(other.health_, other.protection_, other.damage_),
+        attack_{std::make_unique<NormalAttack>()},
+        spec_action_{std::make_unique<HillSpecAction>(kMaxPower)}
+{}
+
+IUnit* Hiller::Clone() {
+    // TODO: подумать о реализации умных указателей, чтобы не вызывать деструкторы
+    Hiller* hiller = new Hiller{*this};
+    return hiller;
+}
 
 void Hiller::DecreaseHealth(unsigned int damage) {
     if (damage >= health_ + protection_) {

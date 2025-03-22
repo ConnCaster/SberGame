@@ -29,5 +29,6 @@ int main() {
     hiller.PerformSpecAction(&hiller);
     hiller.PerformSpecAction(hero_clone);
 
+    delete hero_clone;
     return 0;
 }

@@ -1,7 +1,6 @@
 #ifndef SBERGAME_ARCHER_H
 #define SBERGAME_ARCHER_H
 
-#include <iostream>
 #include <memory>
 
 #include "interfaces/IAttack.h"
@@ -14,7 +13,9 @@ public:
     Archer();
     ~Archer() override = default;
 
-    IUnit* Clone() override { return new Archer{}; };
+    Archer(const Archer& other);
+
+    IUnit* Clone() override;
     void Hill(unsigned int additional_health) override;
 
     void DecreaseHealth(unsigned int damage) override;

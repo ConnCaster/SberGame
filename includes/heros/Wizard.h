@@ -1,7 +1,6 @@
 #ifndef SBERGAME_WIZARD_H
 #define SBERGAME_WIZARD_H
 
-#include <iostream>
 #include <memory>
 
 #include "interfaces/ISpecAction.h"

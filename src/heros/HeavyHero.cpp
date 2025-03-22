@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "heros/HeavyHero.h"
 #include "attacks/NormalAttack.h"
 

@@ -1,5 +1,6 @@
-#include "heros/Wizard.h"
+#include <iostream>
 
+#include "heros/Wizard.h"
 #include "spec_actions/CloneSpecAction.h"
 
 constexpr static unsigned int kMaxHealth = 70;

@@ -1,7 +1,6 @@
 #ifndef SBERGAME_HEAVYHERO_H
 #define SBERGAME_HEAVYHERO_H
 
-#include <iostream>
 #include <memory>
 
 #include "interfaces/IAttack.h"

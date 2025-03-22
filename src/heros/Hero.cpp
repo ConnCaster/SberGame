@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "heros/Hero.h"
 #include "attacks/NormalAttack.h"
 
@@ -9,6 +11,16 @@ Hero::Hero()
     : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
     attack_{std::make_unique<NormalAttack>()}
 {}
+
+Hero::Hero(const Hero& other)
+    : IUnit(other.health_, other.protection_, other.damage_), attack_{std::make_unique<NormalAttack>()}
+{}
+
+IUnit* Hero::Clone() {
+    // TODO: подумать о реализации умных указателей, чтобы не вызывать деструкторы
+    Hero* hero = new Hero{*this};
+    return hero;
+}
 
 void Hero::DecreaseHealth(unsigned int damage) {
     if (damage >= health_ + protection_) {

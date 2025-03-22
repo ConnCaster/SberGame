@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "heros/Archer.h"
 
 constexpr static unsigned int kMaxHealth = 70;
@@ -11,6 +13,16 @@ Archer::Archer()
         distance_{kDistance},
         attack_{nullptr}
 {}
+
+Archer::Archer(const Archer& other)
+    : IUnit(other.health_, other.protection_, other.damage_), attack_{nullptr}
+{}
+
+IUnit* Archer::Clone() {
+    // TODO: подумать о реализации умных указателей, чтобы не вызывать деструкторы
+    Archer* archer = new Archer{*this};
+    return archer;
+}
 
 void Archer::DecreaseHealth(unsigned int damage) {
     if (damage >= health_ + protection_) {

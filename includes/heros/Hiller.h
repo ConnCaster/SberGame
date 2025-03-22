@@ -1,7 +1,6 @@
 #ifndef SBERGAME_HILLER_H
 #define SBERGAME_HILLER_H
 
-#include <iostream>
 #include <memory>
 
 #include "interfaces/IAttack.h"
@@ -14,7 +13,9 @@ public:
     Hiller();
     ~Hiller() override = default;
 
-    IUnit* Clone() override { return new Hiller{}; };
+    Hiller(const Hiller& other);
+
+    IUnit* Clone() override;
 
     void DecreaseHealth(unsigned int damage) override;
 
