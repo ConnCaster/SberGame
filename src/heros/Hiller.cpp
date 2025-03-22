@@ -7,14 +7,11 @@ constexpr static unsigned int kMaxHealth = 70;
 constexpr static unsigned int kMaxProtection = 10;
 constexpr static unsigned int kMaxDamage = 20;
 
-constexpr static bool kIsHillable = false;
-constexpr static bool kIsClonable = true;
-
 constexpr static unsigned int kDistance = 2;
 constexpr static unsigned int kMaxPower = 30;
 
 Hiller::Hiller()
-        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage, kIsHillable, kIsClonable),
+        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
         distance_{kDistance},
         attack_{std::make_unique<NormalAttack>()},
         spec_action_{std::make_unique<HillSpecAction>(kMaxPower)}

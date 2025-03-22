@@ -6,13 +6,10 @@ constexpr static unsigned int kMaxHealth = 70;
 constexpr static unsigned int kMaxProtection = 0;
 constexpr static unsigned int kMaxDamage = 0;
 
-constexpr static bool kIsHillable = false;
-constexpr static bool kIsClonable = false;
-
 constexpr static unsigned int kDistance = 1;
 
 Wizard::Wizard()
-        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage, kIsHillable, kIsClonable),
+        : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
           distance_{kDistance},
           spec_action_{std::make_unique<CloneSpecAction>()}
 {}

@@ -1,21 +1,14 @@
 #include "heros/Hero.h"
+#include "attacks/NormalAttack.h"
 
 constexpr static unsigned int kMaxHealth = 100;
 constexpr static unsigned int kMaxProtection = 10;
 constexpr static unsigned int kMaxDamage = 20;
 
-constexpr static bool kIsHillable = true;
-constexpr static bool kIsClonable = true;
-
 Hero::Hero()
-    : IUnit(kMaxHealth, kMaxProtection, kMaxDamage,  kIsHillable,kIsClonable),
-    attack_{nullptr}
+    : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
+    attack_{std::make_unique<NormalAttack>()}
 {}
-
-//IUnit* Hero::Clone() {
-//    return nullptr;
-//}
-
 
 void Hero::DecreaseHealth(unsigned int damage) {
     if (damage >= health_ + protection_) {
@@ -40,7 +33,7 @@ void Hero::SetAttack(std::unique_ptr<IAttack> attack) {
     }
 }
 
-void Hero::IncreaseHealth(unsigned int additional_health) {
+void Hero::Hill(unsigned int additional_health) {
     health_ = (health_ + additional_health > kMaxHealth) ? kMaxHealth : health_ + additional_health;
 }
 

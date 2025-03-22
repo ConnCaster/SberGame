@@ -7,8 +7,9 @@
 #include "interfaces/IAttack.h"
 #include "interfaces/ISpecAction.h"
 #include "interfaces/IUnit.h"
+#include "interfaces/ICanBeCloned.h"
 
-class Hiller : public IUnit {
+class Hiller : public IUnit, public ICanBeCloned {
 public:
     Hiller();
     ~Hiller() override = default;
@@ -23,8 +24,6 @@ public:
     void PerformAttack(IUnit *target);
     void PerformSpecAction(IUnit *target);
 
-private:
-    void IncreaseHealth(unsigned int additional_health) override {};
 
 private:
 //    unsigned int power_;

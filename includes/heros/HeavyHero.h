@@ -19,10 +19,6 @@ public:
     void PerformAttack(IUnit *target);
 
 private:
-    IUnit* Clone() override {};
-    void IncreaseHealth(unsigned int additional_health) override {};
-
-private:
     std::unique_ptr<IAttack> attack_;
 };
 

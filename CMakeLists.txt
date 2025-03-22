@@ -7,6 +7,8 @@ list(APPEND ${PROJECT_NAME}_HEADERS
         includes/interfaces/IUnit.h
         includes/interfaces/IAction.h
         includes/interfaces/ISpecAction.h
+        includes/interfaces/ICanBeCloned.h
+        includes/interfaces/ICanBeHilled.h
 
         includes/heros/HeavyHero.h
         includes/heros/Hero.h

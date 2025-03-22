@@ -19,10 +19,6 @@ public:
     IUnit* PerformSpecAction(IUnit *target);
 
 private:
-    IUnit* Clone() override {};
-    void IncreaseHealth(unsigned int additional_health) override {};
-
-private:
     unsigned int distance_;
 
     std::unique_ptr<ISpecAction> spec_action_;

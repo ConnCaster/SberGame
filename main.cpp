@@ -14,18 +14,20 @@
 #include "spec_actions/HillSpecAction.h"
 
 int main() {
+    srand(time(nullptr));
+
     HeavyHero heavy_hero{};
     Hero hero{};
 
     Wizard wizard{};
-    IUnit* clone1 = wizard.PerformSpecAction(&heavy_hero);
-    IUnit* clone2 = wizard.PerformSpecAction(&hero);
+    HeavyHero* heavy_hero_clone = dynamic_cast<HeavyHero*>(wizard.PerformSpecAction(&heavy_hero));
+    Hero* hero_clone = dynamic_cast<Hero*>(wizard.PerformSpecAction(&hero));
 
-//    Hero hero{};
-//    hero.SetAttack(std::make_unique<NormalAttack>());
+    heavy_hero.PerformAttack(hero_clone);
 
-//    hero.PerformAttack(&heavy_hero);
-
+    Hiller hiller{};
+    hiller.PerformSpecAction(&hiller);
+    hiller.PerformSpecAction(hero_clone);
 
     return 0;
 }

@@ -6,16 +6,18 @@
 
 #include "interfaces/IAttack.h"
 #include "interfaces/IUnit.h"
+#include "interfaces/ICanBeCloned.h"
+#include "interfaces/ICanBeHilled.h"
 
-class Archer : public IUnit {
+class Archer : public IUnit, public ICanBeHilled, public ICanBeCloned {
 public:
     Archer();
     ~Archer() override = default;
 
     IUnit* Clone() override { return new Archer{}; };
+    void Hill(unsigned int additional_health) override;
 
     void DecreaseHealth(unsigned int damage) override;
-    void IncreaseHealth(unsigned int additional_health) override;
 
     // атака и спецвозможности ...
     void SetAttack(std::unique_ptr<IAttack> attack);
