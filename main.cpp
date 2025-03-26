@@ -13,22 +13,14 @@
 #include "attacks/NormalAttack.h"
 #include "spec_actions/HillSpecAction.h"
 
+#include "Game.h"
+
 int main() {
     srand(time(nullptr));
 
-    HeavyHero heavy_hero{};
-    Hero hero{};
+    Game* game = Game::GetInstance();
+    game->Run();
 
-    Wizard wizard{};
-    HeavyHero* heavy_hero_clone = dynamic_cast<HeavyHero*>(wizard.PerformSpecAction(&heavy_hero));
-    Hero* hero_clone = dynamic_cast<Hero*>(wizard.PerformSpecAction(&hero));
-
-    heavy_hero.PerformAttack(hero_clone);
-
-    Hiller hiller{};
-    hiller.PerformSpecAction(&hiller);
-    hiller.PerformSpecAction(hero_clone);
-
-    delete hero_clone;
+    delete game;
     return 0;
 }

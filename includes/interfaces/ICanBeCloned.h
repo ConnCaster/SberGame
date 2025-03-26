@@ -3,6 +3,7 @@
 
 #include "interfaces/IUnit.h"
 
+// @brief Pattern Prototype
 class ICanBeCloned {
 public:
     virtual ~ICanBeCloned() = default;
