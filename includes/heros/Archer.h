@@ -24,9 +24,10 @@ public:
     void SetAttack(std::unique_ptr<IAttack> attack);
     void PerformAttack(IUnit *target);
 
-private:
-    unsigned int distance_;
+public:
+    static unsigned int distance_;
 
+private:
     std::unique_ptr<IAttack> attack_;
 };
 

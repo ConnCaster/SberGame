@@ -25,12 +25,12 @@ Hiller::Hiller(const Hiller& other)
 {}
 
 IUnit* Hiller::Clone() {
-    // TODO: подумать о реализации умных указателей, чтобы не вызывать деструкторы
     Hiller* hiller = new Hiller{*this};
     return hiller;
 }
 
 void Hiller::DecreaseHealth(unsigned int damage) {
+    std::cout << "[Hiller] health " << health_ << " -> ";
     if (damage >= health_ + protection_) {
         protection_ = 0;
         health_ = 0;
@@ -43,6 +43,7 @@ void Hiller::DecreaseHealth(unsigned int damage) {
             protection_ -= damage;
         }
     }
+    std::cout << health_ << std::endl;
 }
 
 void Hiller::SetAttack(std::unique_ptr<IAttack> attack) {

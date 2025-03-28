@@ -17,12 +17,12 @@ Hero::Hero(const Hero& other)
 {}
 
 IUnit* Hero::Clone() {
-    // TODO: подумать о реализации умных указателей, чтобы не вызывать деструкторы
     Hero* hero = new Hero{*this};
     return hero;
 }
 
 void Hero::DecreaseHealth(unsigned int damage) {
+    std::cout << "[Hero] health " << health_ << " -> ";
     if (damage >= health_ + protection_) {
         protection_ = 0;
         health_ = 0;
@@ -35,6 +35,7 @@ void Hero::DecreaseHealth(unsigned int damage) {
             protection_ -= damage;
         }
     }
+    std::cout << health_ << std::endl;
 }
 
 void Hero::SetAttack(std::unique_ptr<IAttack> attack) {

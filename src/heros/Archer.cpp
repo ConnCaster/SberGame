@@ -1,4 +1,5 @@
 #include <iostream>
+#include <attacks/DistanceAttack.h>
 
 #include "heros/Archer.h"
 
@@ -8,23 +9,24 @@ constexpr static unsigned int kMaxDamage = 20;
 
 constexpr static unsigned int kDistance = 2;
 
+unsigned int Archer::distance_ = kDistance;
+
 Archer::Archer()
         : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),
-        distance_{kDistance},
-        attack_{nullptr}
+        attack_{std::make_unique<DistanceAttack>()}
 {}
 
 Archer::Archer(const Archer& other)
-    : IUnit(other.health_, other.protection_, other.damage_), attack_{nullptr}
+    : IUnit(other.health_, other.protection_, other.damage_), attack_{std::make_unique<DistanceAttack>()}
 {}
 
 IUnit* Archer::Clone() {
-    // TODO: подумать о реализации умных указателей, чтобы не вызывать деструкторы
     Archer* archer = new Archer{*this};
     return archer;
 }
 
 void Archer::DecreaseHealth(unsigned int damage) {
+    std::cout << "[Archer] health " << health_ << " -> ";
     if (damage >= health_ + protection_) {
         protection_ = 0;
         health_ = 0;
@@ -37,7 +39,9 @@ void Archer::DecreaseHealth(unsigned int damage) {
             protection_ -= damage;
         }
     }
+    std::cout << health_ << std::endl;
 }
+
 void Archer::SetAttack(std::unique_ptr<IAttack> attack) {
     if (attack_ != nullptr) {
         attack_.reset(attack.get());

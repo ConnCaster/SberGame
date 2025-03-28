@@ -8,31 +8,27 @@
 #include "interfaces/IUnit.h"
 #include "UnitFactory.h"
 
+
 // @brief Pattern ObjectPool
 class Team {
 public:
     Team();
     ~Team();
 
-    // работа с командой юнитов: получение и возрат юнитов для боя
+    // работа с командой юнитов: получение и возрат юнитов во время боя
     IUnit* GetUnit();
     void ReturnUnit(IUnit* unit);
 
-    std::string GetInfo() const {
-        return {
-                "Team: " + std::to_string(units_.size()) + " units "
-                "cost: " + std::to_string(team_cost_)
-        };
-    }
+    void AddUnit(IUnit* unit);
 
     bool IsEmpty() const { return units_.empty(); }
-
-private:
-    void GenerateTeam();
+    unsigned int GetSize() const { return units_.size(); }
+    IUnit* GetRandomUnit(unsigned int distance = 0);
 
 private:
     std::deque<IUnit*> units_;
-    unsigned int team_cost_;
 };
+
+std::string ExtractTypeFromUnitPtr(IUnit* unit);
 
 #endif //SBERGAME_TEAM_H

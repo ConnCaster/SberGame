@@ -16,6 +16,7 @@ Wizard::Wizard()
 {}
 
 void Wizard::DecreaseHealth(unsigned int damage) {
+    std::cout << "[Wizard] health " << health_ << " -> ";
     if (damage >= health_ + protection_) {
         protection_ = 0;
         health_ = 0;
@@ -28,6 +29,7 @@ void Wizard::DecreaseHealth(unsigned int damage) {
             protection_ -= damage;
         }
     }
+    std::cout << health_ << std::endl;
 }
 
 void Wizard::SetSpecAction(std::unique_ptr<ISpecAction> spec_action) {

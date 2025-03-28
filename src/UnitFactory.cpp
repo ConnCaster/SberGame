@@ -12,5 +12,6 @@ IUnit *UnitFactory::CreateUnit(const std::string& hero_type) {
     } else if (hero_type == "Wizard") {
         return new Wizard{};
     }
+    // TODO: добавить нового героя
     return nullptr;
 }

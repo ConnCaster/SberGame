@@ -14,6 +14,7 @@ HeavyHero::HeavyHero()
 
 
 void HeavyHero::DecreaseHealth(unsigned int damage) {
+    std::cout << "[HeavyHero] health " << health_ << " -> ";
     if (damage >= health_ + protection_) {
         protection_ = 0;
         health_ = 0;
@@ -26,6 +27,7 @@ void HeavyHero::DecreaseHealth(unsigned int damage) {
             protection_ -= damage;
         }
     }
+    std::cout << health_ << std::endl;
 }
 
 void HeavyHero::SetAttack(std::unique_ptr<IAttack> attack) {
