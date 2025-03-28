@@ -17,6 +17,7 @@ private:
     unsigned int damage_;
 };
 
+// @brief Pattern Adapter
 class WagenburgAdapter : public IUnit {
 public:
     WagenburgAdapter(Wagenburg* wagenburg)
