@@ -126,6 +126,8 @@ void Fight(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
         if (red_cloned_unit) {
             l_team->AddUnit(red_cloned_unit);
         }
+    } else if (typeid(*l) == typeid(WagenburgAdapter)) {
+        std::cout << "Wageeeeenbuuuuuurggg" << std::endl;
     }
     if (r && r->GetHealth() == 0) {
         std::cout << "\tFINISH HIM!!!" << std::endl;

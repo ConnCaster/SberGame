@@ -7,11 +7,12 @@
 #include "team/TeamBuilder.h"
 
 const std::map<std::string, unsigned int> kHeroCosts {
-    {"Hero",        20},
-    {"HeavyHero",   30},
-    {"Archer",      10},
-    {"Hiller",      20},
+    {"Hero",        40},
+    {"HeavyHero",   50},
+    {"Archer",      30},
+    {"Hiller",      10},
     {"Wizard",      20},
+    {"Wagenburg",   60}
 };
 constexpr unsigned int kMinUnitCost = 10;
 

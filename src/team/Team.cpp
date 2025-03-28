@@ -59,6 +59,7 @@ std::string ExtractTypeFromUnitPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(Archer)) return "Archer";
     if (typeid(*unit) == typeid(Hiller)) return "Hiller";
     if (typeid(*unit) == typeid(Wizard)) return "Wizard";
+    if (typeid(*unit) == typeid(WagenburgAdapter)) return "Wagenburg";
 }
 
 

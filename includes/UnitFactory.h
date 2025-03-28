@@ -10,6 +10,7 @@
 #include "heros/Archer.h"
 #include "heros/Hiller.h"
 #include "heros/Wizard.h"
+#include "heros/Wagenburg.h"
 
 // @brief Pattern FactoryMethod
 class UnitFactory {
