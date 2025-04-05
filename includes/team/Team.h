@@ -12,7 +12,7 @@
 // @brief Pattern ObjectPool
 class Team {
 public:
-    Team();
+    Team(const std::string team_name);
     ~Team();
 
     // работа с командой юнитов: получение и возрат юнитов во время боя
@@ -25,8 +25,11 @@ public:
     unsigned int GetSize() const { return units_.size(); }
     IUnit* GetRandomUnit(unsigned int distance = 0);
 
+    std::string GetTeamInfo() const;
+
 private:
     std::deque<IUnit*> units_;
+    std::string team_name_;
 };
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit);

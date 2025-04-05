@@ -24,9 +24,8 @@ Game::~Game() {
 
 void Game::Run() {
     if (SetTeamGenerationType()) return;
-    std::cout << "\n==== Start game ====\n[RED] ";
+    std::cout << "\n==== Start game ====\n";
     red_ = CreateTeam(red_team_builder_);
-    std::cout << "[BLUE] ";
     blue_ = CreateTeam(blue_team_builder_);
     /* TODO: выбор первой атакующей команды - random
 1) Атакующая команда определяется рандомно всегда
@@ -69,8 +68,8 @@ int Game::SetTeamGenerationType() {
     std::cout << "Enter team maximum cost: ";
     unsigned int team_max_cost{0};
     std::cin >> team_max_cost;
-    red_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, team_max_cost);
-    blue_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, team_max_cost);
+    red_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, "Red", team_max_cost);
+    blue_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, "Blue", team_max_cost);
     return 0;
 }
 

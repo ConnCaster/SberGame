@@ -32,8 +32,8 @@ void TeamBuilderRandom::GenerateTeam() {
 }
 
 Team* TeamBuilderRandom::GetTeam() {
-    std::cout << "Team: " + std::to_string(team_->GetSize()) + " units, "
-                 "cost: " + std::to_string(team_cost_) << std::endl;
+    std::cout << team_->GetTeamInfo() <<
+                 "Cost: " + std::to_string(team_cost_) << "\n\n";
     return team_;
 }
 
@@ -59,7 +59,7 @@ void TeamBuilderGreedy::GenerateTeam() {
 }
 
 Team* TeamBuilderGreedy::GetTeam() {
-    std::cout << "Team: " + std::to_string(team_->GetSize()) + " units, "
-                 "cost: " + std::to_string(team_cost_) << std::endl;
+    std::cout << team_->GetTeamInfo() <<
+                 "Cost: " + std::to_string(team_cost_) << std::endl;
     return team_;
 }

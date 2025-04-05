@@ -14,8 +14,8 @@ public:
 
 class TeamBuilderRandom : public ITeamBuilder {
 public:
-    TeamBuilderRandom(unsigned int team_cost_max)
-            : team_{new Team{}}, team_cost_{0}, team_cost_max{team_cost_max} {}
+    TeamBuilderRandom(const std::string team_name, unsigned int team_cost_max)
+            : team_{new Team{team_name}}, team_cost_{0}, team_cost_max{team_cost_max} {}
     ~TeamBuilderRandom() = default;
 
     void GenerateTeam() override;
@@ -29,8 +29,8 @@ private:
 
 class TeamBuilderGreedy : public ITeamBuilder {
 public:
-    TeamBuilderGreedy(unsigned int team_cost_max)
-            : team_{new Team{}}, team_cost_{0}, team_cost_max{team_cost_max} {}
+    TeamBuilderGreedy(const std::string team_name, unsigned int team_cost_max)
+            : team_{new Team{team_name}}, team_cost_{0}, team_cost_max{team_cost_max} {}
     ~TeamBuilderGreedy() = default;
 
     void GenerateTeam() override;
@@ -59,13 +59,13 @@ private:
 // @brief Pattern FactoryMethod
 class ITeamBuilderFactoryM {
 public:
-    static ITeamBuilder* CreateTeamBuilder(unsigned int type, unsigned int team_max_cost) {
+    static ITeamBuilder* CreateTeamBuilder(unsigned int type, const std::string team_name, unsigned int team_max_cost) {
         switch (type) {
             case 1: {
-                return new TeamBuilderRandom{team_max_cost};
+                return new TeamBuilderRandom{team_name, team_max_cost};
             }
             case 2: {
-                return new TeamBuilderGreedy{team_max_cost};
+                return new TeamBuilderGreedy{team_name, team_max_cost};
             }
             case 3: {
                 // TODO: добавить третий способ генерации команды

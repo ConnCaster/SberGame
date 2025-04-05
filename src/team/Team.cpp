@@ -1,7 +1,7 @@
 #include <team/Team.h>
 
-Team::Team()
-    : units_{}
+Team::Team(const std::string team_name)
+    : units_{}, team_name_(team_name)
 {}
 
 Team::~Team() {
@@ -52,6 +52,15 @@ IUnit* Team::GetRandomUnit(unsigned int distance) {
     units_.erase(it);
     return u;
 }
+
+std::string Team::GetTeamInfo() const {
+    std::string out{"Team: '" + team_name_ + "' of " + std::to_string(GetSize()) + " units\n"};
+    for (int i = 0; i < units_.size(); ++i) {
+        out += "\t[" + std::to_string(i+1) + "] " + ExtractTypeFromUnitPtr(units_[i]) + "\n\t\t" + units_[i]->GetInfo() + "\n";
+    }
+    return out;
+}
+
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(HeavyHero)) return "HeavyHero";
