@@ -18,15 +18,11 @@ Wizard::Wizard()
 void Wizard::DecreaseHealth(unsigned int damage) {
     std::cout << "[Wizard] health " << health_ << " -> ";
     if (damage >= health_ + protection_) {
-        protection_ = 0;
         health_ = 0;
     } else {
         if (damage >= protection_) {
             damage -= protection_;
-            protection_ = 0;
             health_ -= damage;
-        } else {
-            protection_ -= damage;
         }
     }
     std::cout << health_ << std::endl;

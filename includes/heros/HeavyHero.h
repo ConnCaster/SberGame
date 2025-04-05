@@ -17,8 +17,77 @@ public:
     void SetAttack(std::unique_ptr<IAttack> attack);
     void PerformAttack(IUnit *target);
 
+    // методы работы с усилителями HeavyHero (которые на телеге едут)
+    virtual bool HasBuff(const std::string &buff_name) const { return  false; }
+    virtual void RemoveBuff(const std::string &buff_name) {};
+
 private:
     std::unique_ptr<IAttack> attack_;
+};
+
+
+class HeavyHeroDecorator : public HeavyHero {
+protected:
+    HeavyHero* inner_heavy_hero_;
+    std::string buff_name_;
+    int attack_bonus_;
+    int defense_bonus_;
+
+public:
+    HeavyHeroDecorator(HeavyHero* hero, const std::string &buff_name, int attack, int defense)
+        : inner_heavy_hero_(hero), buff_name_(buff_name), attack_bonus_(attack), defense_bonus_(defense) {
+    }
+
+    void DecreaseHealth(unsigned int damage) override {
+        // шанс 50%, что при ударе, сила которого больше уровня защиты, бафф будет снесен
+        if (damage > protection_ && ((rand() % 100) < 50)) {
+            RemoveBuff(buff_name_);
+            inner_heavy_hero_->DecreaseHealth(damage);
+        } else {
+            inner_heavy_hero_->DecreaseHealth(damage - defense_bonus_);
+        }
+    }
+
+    bool HasBuff(const std::string &buff_name) const override {
+        if (buff_name == buff_name_) {
+            return true;
+        }
+        return inner_heavy_hero_->HasBuff(buff_name);
+    }
+
+    void RemoveBuff(const std::string &buff_name) override {
+        if (buff_name == buff_name_) {
+            inner_heavy_hero_ = dynamic_cast<HeavyHeroDecorator *>(this)->inner_heavy_hero_;
+        } else {
+            inner_heavy_hero_->RemoveBuff(buff_name);
+        }
+    }
+};
+
+class HorseDecorator : public HeavyHeroDecorator {
+public:
+    HorseDecorator(HeavyHero* hero)
+        : HeavyHeroDecorator(hero, "Horse", 0, 5) {}
+};
+
+class SpearDecorator : public HeavyHeroDecorator {
+public:
+    SpearDecorator(HeavyHero* hero)
+        : HeavyHeroDecorator(hero, "Spear", 10, 0) {
+        // TODO: подумать, как увеличить и уменьшить потом урон героя с копьем
+    }
+};
+
+class ShieldDecorator : public HeavyHeroDecorator {
+public:
+    ShieldDecorator(HeavyHero* hero)
+        : HeavyHeroDecorator(hero, "Shield", 0, 8) {}
+};
+
+class HelmetDecorator : public HeavyHeroDecorator {
+public:
+    HelmetDecorator(HeavyHero* hero)
+        : HeavyHeroDecorator(hero, "Helmet", 0, 3) {}
 };
 
 #endif //SBERGAME_HEAVYHERO_H

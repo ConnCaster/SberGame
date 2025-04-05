@@ -3,6 +3,13 @@
 int main() {
     srand(time(nullptr));
 
+    HeavyHero* heavy_hero = new HeavyHero{};
+    Hero* hero = new Hero{};
+
+    heavy_hero = new HorseDecorator(heavy_hero);
+    heavy_hero = new ShieldDecorator(heavy_hero);
+    hero->PerformAttack(heavy_hero);
+
     Game* game = Game::GetInstance();
     game->Run();
 
