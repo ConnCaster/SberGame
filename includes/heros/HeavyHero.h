@@ -2,6 +2,7 @@
 #define SBERGAME_HEAVYHERO_H
 
 #include <memory>
+#include <iostream>
 
 #include "interfaces/IAttack.h"
 #include "interfaces/IUnit.h"
@@ -15,13 +16,13 @@ public:
 
     // атака и спецвозможности ...
     void SetAttack(std::unique_ptr<IAttack> attack);
-    void PerformAttack(IUnit *target);
+    virtual void PerformAttack(IUnit *target);
 
     // методы работы с усилителями HeavyHero (которые на телеге едут)
     virtual bool HasBuff(const std::string &buff_name) const { return  false; }
     virtual void RemoveBuff(const std::string &buff_name) {};
 
-private:
+protected:
     std::unique_ptr<IAttack> attack_;
 };
 
@@ -39,11 +40,14 @@ public:
     }
 
     void DecreaseHealth(unsigned int damage) override {
+        std::cout << "[HeavyHero] Defense buff " << buff_name_ << std::endl;
         // шанс 50%, что при ударе, сила которого больше уровня защиты, бафф будет снесен
         if (damage > protection_ && ((rand() % 100) < 50)) {
+            std::cout << "[HeavyHero] Buff " << buff_name_ << " is losed" << std::endl;
             RemoveBuff(buff_name_);
             inner_heavy_hero_->DecreaseHealth(damage);
         } else {
+            std::cout << "[HeavyHero] Buff " << buff_name_ << " is saved" << std::endl;
             inner_heavy_hero_->DecreaseHealth(damage - defense_bonus_);
         }
     }
@@ -56,11 +60,16 @@ public:
     }
 
     void RemoveBuff(const std::string &buff_name) override {
+        if (buff_name_ == "Spear") attack_bonus_ = 0;
         if (buff_name == buff_name_) {
             inner_heavy_hero_ = dynamic_cast<HeavyHeroDecorator *>(this)->inner_heavy_hero_;
         } else {
             inner_heavy_hero_->RemoveBuff(buff_name);
         }
+    }
+
+    virtual void PerformAttack(IUnit *target) {
+        inner_heavy_hero_->PerformAttack(target);
     }
 };
 
@@ -73,8 +82,15 @@ public:
 class SpearDecorator : public HeavyHeroDecorator {
 public:
     SpearDecorator(HeavyHero* hero)
-        : HeavyHeroDecorator(hero, "Spear", 10, 0) {
-        // TODO: подумать, как увеличить и уменьшить потом урон героя с копьем
+        : HeavyHeroDecorator(hero, "Spear", 10, 0) {}
+
+    void PerformAttack(IUnit *target) {
+        std::cout << "[HeavyHero] Attack buff " << buff_name_ << std::endl;
+        if (attack_) {
+            attack_->DoAttack(target, damage_ + attack_bonus_);
+        } else {
+            std::cout << "[HeavyHero] There is no attack set. Abort..." << std::endl;
+        }
     }
 };
 
