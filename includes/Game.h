@@ -5,7 +5,7 @@
 
 #include "team/TeamBuilder.h"
 
-// @brief Pattern Singlton and LazyInitialization
+// @brief Pattern Singleton and LazyInitialization
 class Game {
 public:
     static Game* GetInstance();
@@ -29,10 +29,6 @@ private:
     ITeamBuilder* blue_team_builder_;
 };
 
-static bool IsBuildTypeCorrect(unsigned int type) {
-    return (type <= 3 && type > 0);
-}
-
-void Fight(IUnit* l, Team* l_team, IUnit* r, Team* r_team);
+int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team);
 
 #endif //SBERGAME_GAME_H

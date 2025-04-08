@@ -3,8 +3,8 @@
 int main() {
     srand(time(nullptr));
 
-    HeavyHero* heavy_hero = new HeavyHero{};
-    Hero* hero = new Hero{};
+//    HeavyHero* heavy_hero = new HeavyHero{};
+//    Hero* hero = new Hero{};
 
     /*
     heavy_hero = new HorseDecorator(heavy_hero);

@@ -26,6 +26,7 @@ public:
     IUnit* GetRandomUnit(unsigned int distance = 0);
 
     std::string GetTeamInfo() const;
+    std::string GetTeamName() const { return team_name_; }
 
 private:
     std::deque<IUnit*> units_;

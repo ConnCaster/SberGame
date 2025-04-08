@@ -20,7 +20,7 @@ IUnit* Team::GetUnit() {
 }
 
 void Team::ReturnUnit(IUnit *unit) {
-    units_.push_back(unit);
+    units_.push_front(unit);
 }
 
 void Team::AddUnit(IUnit* unit) {

@@ -23,27 +23,35 @@ Game::~Game() {
 }
 
 void Game::Run() {
-    if (SetTeamGenerationType()) return;
+    SetTeamGenerationType();
     std::cout << "\n==== Start game ====\n";
     red_ = CreateTeam(red_team_builder_);
     blue_ = CreateTeam(blue_team_builder_);
-    /* TODO: выбор первой атакующей команды - random
-1) Атакующая команда определяется рандомно всегда
-2) Если у принимающего остается хп, то возвращаемся к 1 этапу
-3) Если у получающего заканчивается хп, то он выбывает, на его место встает следующий боец и очереди. Возвращаемся к 1 этапу.
-     */
+
     bool red_team_order = true;
     while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
         IUnit* red_unit = red_->GetUnit();
         IUnit* blue_unit = blue_->GetUnit();
         if (red_team_order) {
-            std::cout << "[Red] ";
-            Fight(red_unit, red_, blue_unit, blue_);
+            // герой наносит удар
+            int is_killed = Attack(red_unit, red_, blue_unit, blue_);
+            if (!is_killed) {
+                // если противник выжил, то он отвечает
+                red_unit = red_->GetUnit();
+                blue_unit = blue_->GetUnit();
+                Attack(blue_unit, blue_, red_unit, red_);
+            }
             red_team_order = false;
         } else {
-            std::cout << "[Blue] ";
-            Fight(blue_unit, blue_, red_unit, red_);
+            // герой наносит удар
+            int is_killed = Attack(blue_unit, blue_, red_unit, red_);
+            if (!is_killed) {
+                // если противник выжил, то он отвечает
+                red_unit = red_->GetUnit();
+                blue_unit = blue_->GetUnit();
+                Attack(red_unit, red_, blue_unit, blue_);
+            }
             red_team_order = true;
         }
     }
@@ -53,21 +61,12 @@ void Game::Run() {
 int Game::SetTeamGenerationType() {
     delete red_team_builder_;
     delete blue_team_builder_;
-    std::cout << "Enter team generation type:\n\t"
-                 "1. Random\n\t"
-                 "2. Greedy\n\t"
-                 "3. ?????\n";
 
-    unsigned int type{0};
-    std::cin >> type;
-    if(!IsBuildTypeCorrect(type)) {
-        std::cout << "Unknown team generation type" << std::endl;
-        return 1;
-    }
-
+    unsigned int type = rand() % 2+1;
     std::cout << "Enter team maximum cost: ";
     unsigned int team_max_cost{0};
     std::cin >> team_max_cost;
+
     red_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, "Red", team_max_cost);
     blue_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, "Blue", team_max_cost);
     return 0;
@@ -99,7 +98,8 @@ void Game::ShowGameResults() const {
 //       Работает с обоими командами.
 //  2. Hiller лечит и бьет палкой (выбирать, кого лечить, вычислять расстояние, лечить, что за палка и когда??)
 //  3. Wizard клонирует (...)
-void Fight(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
+int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
+    std::cout << "[" << l_team->GetTeamName() << "] ";
     if (typeid(*l) == typeid(HeavyHero)) {
         std::cout << "HeavyHero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
         dynamic_cast<HeavyHero*>(l)->PerformAttack(r);
@@ -128,13 +128,16 @@ void Fight(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
     } else if (typeid(*l) == typeid(WagenburgAdapter)) {
         std::cout << "Wageeeeenbuuuuuurggg" << std::endl;
     }
+    l_team->ReturnUnit(l);
     if (r && r->GetHealth() == 0) {
         std::cout << "\tFINISH HIM!!!" << std::endl;
         delete r;
+        return 1;
     } else {
         if (r) {
             r_team->ReturnUnit(r);
         }
     }
-    l_team->ReturnUnit(l);
+    return 0;
+
 }
