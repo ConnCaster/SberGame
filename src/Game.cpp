@@ -12,7 +12,12 @@ Game* Game::GetInstance() {
 }
 
 Game::Game()
-    : red_{nullptr}, blue_{nullptr}, red_team_builder_{nullptr}, blue_team_builder_{nullptr}
+    : red_{nullptr},
+        blue_{nullptr},
+        red_team_builder_{nullptr},
+        blue_team_builder_{nullptr},
+        logger_death_(new FileLogger("./logger_deaths.log"), LogEventType::LOG_DEATHS),
+        logger_spec_acts_(new FileLogger("./logger_spec_acts.log"), LogEventType::LOG_SPEC_ACTS)
 {}
 
 Game::~Game() {
@@ -28,6 +33,7 @@ void Game::Run() {
     red_ = CreateTeam(red_team_builder_);
     blue_ = CreateTeam(blue_team_builder_);
 
+    // TODO: сделать возможность выбора первой бьющей команды
     bool red_team_order = true;
     while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
@@ -104,7 +110,7 @@ void Game::ShowGameResults() const {
 //       Работает с обоими командами.
 //  2. Hiller лечит и бьет палкой (выбирать, кого лечить, вычислять расстояние, лечить, что за палка и когда??)
 //  3. Wizard клонирует (...)
-int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
+int Game::Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
     std::cout << "[" << l_team->GetTeamName() << "] ";
     if (typeid(*l) == typeid(HeavyHero)) {
         std::cout << "HeavyHero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
@@ -140,6 +146,8 @@ int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
     l_team->ReturnUnit(l);
     if (r && r->GetHealth() == 0) {
         std::cout << "\tFINISH HIM!!!" << std::endl;
+        std::string msg = "[" + r_team->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " was killed\n";
+        logger_death_.Log(msg);
         delete r;
         return 1;
     } else {
@@ -150,11 +158,15 @@ int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
     return 0;
 }
 
-void SpecAction(Team* l_team, Team* r_team, int was_killed) {
-    std::cout << "[" << l_team->GetTeamName() << "] use SpecActions via [" << r_team->GetTeamName() << "]\n";
-    for (int i = (was_killed) ? 1 :0; i < l_team->GetSize(); ++i) {
+void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
+    std::string msg = "[" + l_team->GetTeamName() + "] use SpecActions via [" + r_team->GetTeamName() + "]\n";
+    std::cout << msg;
+    logger_spec_acts_.Log(msg);
+    for (int i = (was_killed) ? 0 : 1; i < l_team->GetSize(); ++i) {
         IUnit* unit = l_team->GetUnitByPos(i);
-        std::cout << "[" << ExtractTypeFromUnitPtr(unit) << "]" << std::endl;
+        msg = "[" + ExtractTypeFromUnitPtr(unit) + "]\n";
+        std::cout << msg;
+        logger_spec_acts_.Log(msg);
+        // TODO: как применять специальные действия
     }
-
 }

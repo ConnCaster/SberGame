@@ -58,6 +58,7 @@ HeavyHero* AppendBuffToHeavyHero(HeavyHero* heavy_hero) {
             std::cout << "[Buff] Too much buffs" << std::endl;
             return heavy_hero;
     }
+    // TODO: Сколько усилителей за раз может получить тяжелый юнит
     int buff_counter = rand() % 5;
     while (buff_counter-- != 0) {
         int buff_type = rand() % 4;

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "team/TeamBuilder.h"
+#include "logger/Logger.h"
 
 // @brief Pattern Singleton and LazyInitialization
 class Game {
@@ -19,7 +20,11 @@ private:
     int SetTeamGenerationType();
     Team* CreateTeam(ITeamBuilder* team_builder);
 
+    int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team);
+    void SpecAction(Team* l_team, Team* r_team, int was_killed);
+
     void ShowGameResults() const;
+
 private:
     static Game* game_instance_;
 
@@ -27,8 +32,10 @@ private:
     Team* blue_;
     ITeamBuilder* red_team_builder_;
     ITeamBuilder* blue_team_builder_;
+
+    Logger logger_death_;
+    Logger logger_spec_acts_;
 };
 
-int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team);
-void SpecAction(Team* l_team, Team* r_team, int was_killed);
+
 #endif //SBERGAME_GAME_H

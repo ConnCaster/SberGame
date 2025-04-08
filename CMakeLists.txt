@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD 20)
 #        includes/Team.h
 #        includes/UnitFactory.h
 #
+#        includes/logger/logger.h
+#
 #        includes/interfaces/IUnit.h
 #        includes/interfaces/IAction.h
 #        includes/interfaces/ISpecAction.h
@@ -34,6 +36,8 @@ list(APPEND ${PROJECT_NAME}_SOURCES
         src/UnitFactory.cpp
         src/team/Team.cpp
         src/team/TeamBuilder.cpp
+
+        src/logger/Logger.cpp
 
         src/heros/HeavyHero.cpp
         src/heros/Hero.cpp
