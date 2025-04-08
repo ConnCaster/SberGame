@@ -61,6 +61,13 @@ std::string Team::GetTeamInfo() const {
     return out;
 }
 
+IUnit* Team::GetUnitByPos(unsigned int pos) {
+    if (units_.empty()) return nullptr;
+    // берем от начала команды
+    std::deque<IUnit*>::iterator it = units_.begin() + pos;
+    return *it;
+}
+
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(HeavyHero)) return "HeavyHero";

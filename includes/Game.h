@@ -30,5 +30,5 @@ private:
 };
 
 int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team);
-
+void SpecAction(Team* l_team, Team* r_team, int was_killed);
 #endif //SBERGAME_GAME_H

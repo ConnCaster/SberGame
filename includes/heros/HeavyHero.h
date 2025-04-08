@@ -26,7 +26,7 @@ protected:
     std::unique_ptr<IAttack> attack_;
 };
 
-
+// @brief Pattern Decorator
 class HeavyHeroDecorator : public HeavyHero {
 protected:
     HeavyHero* inner_heavy_hero_;
@@ -105,5 +105,7 @@ public:
     HelmetDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Helmet", 0, 3) {}
 };
+
+HeavyHero* AppendBuffToHeavyHero(HeavyHero* heavy_hero);
 
 #endif //SBERGAME_HEAVYHERO_H

@@ -24,6 +24,7 @@ public:
     bool IsEmpty() const { return units_.empty(); }
     unsigned int GetSize() const { return units_.size(); }
     IUnit* GetRandomUnit(unsigned int distance = 0);
+    IUnit* GetUnitByPos(unsigned int pos);
 
     std::string GetTeamInfo() const;
     std::string GetTeamName() const { return team_name_; }
@@ -34,5 +35,6 @@ private:
 };
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit);
+
 
 #endif //SBERGAME_TEAM_H

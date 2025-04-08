@@ -35,23 +35,29 @@ void Game::Run() {
         IUnit* blue_unit = blue_->GetUnit();
         if (red_team_order) {
             // герой наносит удар
-            int is_killed = Attack(red_unit, red_, blue_unit, blue_);
-            if (!is_killed) {
+            int is_killed_blue = Attack(red_unit, red_, blue_unit, blue_);
+            int is_killed_red{0};
+            if (!is_killed_blue) {
                 // если противник выжил, то он отвечает
                 red_unit = red_->GetUnit();
                 blue_unit = blue_->GetUnit();
-                Attack(blue_unit, blue_, red_unit, red_);
+                is_killed_red = Attack(blue_unit, blue_, red_unit, red_);
             }
+            SpecAction(red_, blue_, is_killed_red);
+            SpecAction(blue_, red_, is_killed_blue);
             red_team_order = false;
         } else {
             // герой наносит удар
-            int is_killed = Attack(blue_unit, blue_, red_unit, red_);
-            if (!is_killed) {
+            int is_killed_red = Attack(blue_unit, blue_, red_unit, red_);
+            int is_killed_blue{0};
+            if (!is_killed_red) {
                 // если противник выжил, то он отвечает
                 red_unit = red_->GetUnit();
                 blue_unit = blue_->GetUnit();
-                Attack(red_unit, red_, blue_unit, blue_);
+                is_killed_blue = Attack(red_unit, red_, blue_unit, blue_);
             }
+            SpecAction(blue_, red_, is_killed_blue);
+            SpecAction(red_, blue_, is_killed_red);
             red_team_order = true;
         }
     }
@@ -82,7 +88,7 @@ void Game::ShowGameResults() const {
     std::cout << "\n==== STATISTICS =====\n";
     if (red_ && red_->IsEmpty()) {
         std::cout << "Blue team WIN!" << std::endl;
-        std::cout << "Past RED units: " << blue_->GetSize() << std::endl;
+        std::cout << "Past units: " << blue_->GetSize() << std::endl;
     }
     else if (blue_ && blue_->IsEmpty()) {
         std::cout << "Red team WIN!" << std::endl;
@@ -102,6 +108,9 @@ int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
     std::cout << "[" << l_team->GetTeamName() << "] ";
     if (typeid(*l) == typeid(HeavyHero)) {
         std::cout << "HeavyHero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
+//        if (ExtractTypeFromUnitPtr(l_team->GetUnitByPos(0)) == "Hero") {
+//            l = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(l));
+//        }
         dynamic_cast<HeavyHero*>(l)->PerformAttack(r);
     } else if (typeid(*l) == typeid(Hero)) {
         std::cout << "Hero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
@@ -139,5 +148,13 @@ int Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
         }
     }
     return 0;
+}
+
+void SpecAction(Team* l_team, Team* r_team, int was_killed) {
+    std::cout << "[" << l_team->GetTeamName() << "] use SpecActions via [" << r_team->GetTeamName() << "]\n";
+    for (int i = (was_killed) ? 1 :0; i < l_team->GetSize(); ++i) {
+        IUnit* unit = l_team->GetUnitByPos(i);
+        std::cout << "[" << ExtractTypeFromUnitPtr(unit) << "]" << std::endl;
+    }
 
 }
