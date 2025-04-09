@@ -14,6 +14,5 @@ IUnit *UnitFactory::CreateUnit(const std::string& hero_type) {
     } else if (hero_type == "Wagenburg") {
         return new WagenburgAdapter{new Wagenburg{}};
     }
-    // TODO: добавить нового героя
     return nullptr;
 }
