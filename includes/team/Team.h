@@ -12,22 +12,24 @@
 // @brief Pattern ObjectPool
 class Team {
 public:
-    Team(const std::string team_name);
+    Team(const std::string& team_name);
     ~Team();
 
     // работа с командой юнитов: получение и возрат юнитов во время боя
     IUnit* GetUnit();
+    IUnit* GetRandomUnit(unsigned int distance = 0);
+    IUnit* GetUnitByPos(unsigned int pos);
     void ReturnUnit(IUnit* unit);
+    void ReplaceUnit(IUnit* unit, unsigned int pos);
 
     void AddUnit(IUnit* unit);
 
     bool IsEmpty() const { return units_.empty(); }
     unsigned int GetSize() const { return units_.size(); }
-    IUnit* GetRandomUnit(unsigned int distance = 0);
-    IUnit* GetUnitByPos(unsigned int pos);
-
     std::string GetTeamInfo() const;
     std::string GetTeamName() const { return team_name_; }
+
+    IUnit* CheckIfHeavyHeroNeighbour(unsigned int pos) const;
 
 private:
     std::deque<IUnit*> units_;
@@ -35,6 +37,5 @@ private:
 };
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit);
-
-
+std::string ExtractTHeavyHeroypeFromUnitPtr(HeavyHero* unit);
 #endif //SBERGAME_TEAM_H

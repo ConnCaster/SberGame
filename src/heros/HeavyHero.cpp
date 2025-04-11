@@ -59,8 +59,8 @@ HeavyHero* AppendBuffToHeavyHero(HeavyHero* heavy_hero) {
             return heavy_hero;
     }
     // TODO: Сколько усилителей за раз может получить тяжелый юнит
-    int buff_counter = rand() % 5;
-    while (buff_counter-- != 0) {
+//    int buff_counter = rand() % 5;
+//    while (buff_counter-- != 0) {
         int buff_type = rand() % 4;
         switch (buff_type) {
             case 0: {   // Horse
@@ -104,7 +104,7 @@ HeavyHero* AppendBuffToHeavyHero(HeavyHero* heavy_hero) {
                 break;
             }
         }
-    }
+//    }
 
     return heavy_hero;
 }

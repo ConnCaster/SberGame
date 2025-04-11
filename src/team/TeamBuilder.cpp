@@ -7,12 +7,12 @@
 #include "team/TeamBuilder.h"
 
 const std::map<std::string, unsigned int> kHeroCosts {
-    {"Hero",        40},
-    {"HeavyHero",   50},
+    {"Hero",        50},
+    {"HeavyHero",   60},
     {"Archer",      30},
     {"Hiller",      10},
     {"Wizard",      20},
-    {"Wagenburg",   60}
+    {"Wagenburg",   40}
 };
 constexpr unsigned int kMinUnitCost = 10;
 
@@ -26,7 +26,34 @@ void TeamBuilderRandom::GenerateTeam() {
             continue;
         }
         IUnit* unit = UnitFactory::CreateUnit(it->first);
+        /*
+        // Проверка необходимости применения усилителей
+        // если добавляемый герой HeavyHero, то сразу применяем усилители, а затем добавляем героя в команду
+        if (ExtractTypeFromUnitPtr(unit) == "HeavyHero") {
+            if (team_->GetSize() > 0) {
+                IUnit* prev_hero = team_->GetUnitByPos(team_->GetSize() - 1);
+                if (ExtractTypeFromUnitPtr(prev_hero) == "Hero") {
+                    HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(unit));
+                    team_->AddUnit(heavy_hero_with_buff);
+                    std::cout << "BUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUF" << std::endl;
+                } else {
+                    team_->AddUnit(unit);
+                }
+            } else {
+                team_->AddUnit(unit);
+            }
+        } else {*/
+        // проверяем, не был ли предыдущий герой HeavyHero
         team_->AddUnit(unit);
+        if (ExtractTypeFromUnitPtr(unit) == "Hero") {
+            IUnit* heavy_hero = team_->CheckIfHeavyHeroNeighbour(team_->GetSize() - 1);
+            if (heavy_hero) {
+                HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
+                // заменяем предпоследнего героя на героя с бафами
+                team_->ReplaceUnit(heavy_hero_with_buff, team_->GetSize() - 2);
+            }
+        }
+//        }
         team_cost_ += unit_cost;
     }
 }
@@ -53,6 +80,14 @@ void TeamBuilderGreedy::GenerateTeam() {
             }
             IUnit *unit = UnitFactory::CreateUnit(it->first);
             team_->AddUnit(unit);
+            if (ExtractTypeFromUnitPtr(unit) == "Hero") {
+                IUnit* heavy_hero = team_->CheckIfHeavyHeroNeighbour(team_->GetSize() - 1);
+                if (heavy_hero) {
+                    HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
+                    // заменяем предпоследнего героя на героя с бафами
+                    team_->ReplaceUnit(heavy_hero_with_buff, team_->GetSize() - 2);
+                }
+            }
             team_cost_ += unit_cost;
         }
     }

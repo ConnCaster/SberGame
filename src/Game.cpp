@@ -66,6 +66,7 @@ void Game::Run() {
                 right_unit = r->GetUnit();
                 is_killed_left = Attack(right_unit, r, left_unit, l);
             }
+            // применяются специальные действия
             SpecAction(l, r, is_killed_left);
             SpecAction(r, l, is_killed_right);
             left_team_order = false;
@@ -79,6 +80,7 @@ void Game::Run() {
                 right_unit = r->GetUnit();
                 is_killed_right = Attack(left_unit, l, right_unit, r);
             }
+            // применяются специальные действия
             SpecAction(r, l, is_killed_right);
             SpecAction(l, r, is_killed_left);
             left_team_order = true;
@@ -128,17 +130,30 @@ void Game::ShowGameResults() const {
 //  2. Hiller лечит и бьет палкой (выбирать, кого лечить, вычислять расстояние, лечить, что за палка и когда??)
 //  3. Wizard клонирует (...)
 int Game::Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
+    // сбиваем защиту HeavyHero с вероятностью 50%
+    if (ExtractTypeFromUnitPtr(r) == "HeavyHero") {
+        std::string buff_type = ExtractTHeavyHeroypeFromUnitPtr(dynamic_cast<HeavyHero*>(r));
+        if (buff_type == "HorseDecorator" ||
+                buff_type == "SpearDecorator" ||
+                buff_type == "ShieldDecorator" ||
+                buff_type == "HelmetDecorator"
+                ) {
+            if ((rand() % 100) < 50) {
+                std::cout << "[HeavyHero] Buff " << buff_type << " is losed" << std::endl;
+                r = dynamic_cast<HeavyHeroDecorator*>(r)->RemoveBuff(buff_type);
+            } else {
+                std::cout << "[HeavyHero] Buff " << buff_type << " is saved" << std::endl;
+            }
+        }
+    }
     std::cout << "[" << l_team->GetTeamName() << "] ";
-    if (typeid(*l) == typeid(HeavyHero)) {
+    if (ExtractTypeFromUnitPtr(l) == "HeavyHero") {
         std::cout << "HeavyHero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
-//        if (ExtractTypeFromUnitPtr(l_team->GetUnitByPos(0)) == "Hero") {
-//            l = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(l));
-//        }
         dynamic_cast<HeavyHero*>(l)->PerformAttack(r);
-    } else if (typeid(*l) == typeid(Hero)) {
+    } else if ((ExtractTypeFromUnitPtr(l) == "Hero")) {
         std::cout << "Hero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
         dynamic_cast<Hero*>(l)->PerformAttack(r);
-    } else if (typeid(*l) == typeid(Archer)) {
+    } else if ((ExtractTypeFromUnitPtr(l) == "Archer")) {
         std::cout << "Archer attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
 
         r_team->ReturnUnit(r);
@@ -148,16 +163,16 @@ int Game::Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
             r = far_unit;
         }
 
-    } else if (typeid(*l) == typeid(Hiller)) {
+    } else if ((ExtractTypeFromUnitPtr(l) == "Hiller")) {
         std::cout << "Hiller attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
         dynamic_cast<Hiller*>(l)->PerformAttack(r);
-    } else if (typeid(*l) == typeid(Wizard)) {
+    } else if ((ExtractTypeFromUnitPtr(l) == "Wizard")) {
         std::cout << "Wizard clone... " << ExtractTypeFromUnitPtr(l) << std::endl;
         IUnit* red_cloned_unit = dynamic_cast<Wizard*>(l)->PerformSpecAction(l);
         if (red_cloned_unit) {
             l_team->AddUnit(red_cloned_unit);
         }
-    } else if (typeid(*l) == typeid(WagenburgAdapter)) {
+    } else if ((ExtractTypeFromUnitPtr(l) == "Wagenburg")) {
         std::cout << "Wageeeeenbuuuuuurggg" << std::endl;
     }
     l_team->ReturnUnit(l);

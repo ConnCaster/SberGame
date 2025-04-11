@@ -1,6 +1,6 @@
 #include <team/Team.h>
 
-Team::Team(const std::string team_name)
+Team::Team(const std::string& team_name)
     : units_{}, team_name_(team_name)
 {}
 
@@ -21,6 +21,11 @@ IUnit* Team::GetUnit() {
 
 void Team::ReturnUnit(IUnit *unit) {
     units_.push_front(unit);
+}
+
+void Team::ReplaceUnit(IUnit *unit, unsigned int pos) {
+    if (pos < 0 || pos >= GetSize()) return;
+    units_.at(pos) = unit;
 }
 
 void Team::AddUnit(IUnit* unit) {
@@ -71,6 +76,10 @@ IUnit* Team::GetUnitByPos(unsigned int pos) {
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(HeavyHero)) return "HeavyHero";
+    if (typeid(*unit) == typeid(HorseDecorator)) return "HeavyHero";
+    if (typeid(*unit) == typeid(SpearDecorator)) return "HeavyHero";
+    if (typeid(*unit) == typeid(ShieldDecorator)) return "HeavyHero";
+    if (typeid(*unit) == typeid(HelmetDecorator)) return "HeavyHero";
     if (typeid(*unit) == typeid(Hero)) return "Hero";
     if (typeid(*unit) == typeid(Archer)) return "Archer";
     if (typeid(*unit) == typeid(Hiller)) return "Hiller";
@@ -78,4 +87,30 @@ std::string ExtractTypeFromUnitPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(WagenburgAdapter)) return "Wagenburg";
 }
 
+std::string ExtractTHeavyHeroypeFromUnitPtr(HeavyHero* unit) {
+    if (typeid(*unit) == typeid(HeavyHero)) return "HeavyHero";
+    if (typeid(*unit) == typeid(HorseDecorator)) return "HorseDecorator";
+    if (typeid(*unit) == typeid(SpearDecorator)) return "SpearDecorator";
+    if (typeid(*unit) == typeid(ShieldDecorator)) return "ShieldDecorator";
+    if (typeid(*unit) == typeid(HelmetDecorator)) return "HelmetDecorator";
+
+}
+
+IUnit* Team::CheckIfHeavyHeroNeighbour(unsigned int pos) const {
+    // если в команде один герой - у него нет соседа
+    if (GetSize() == 1 || GetSize() == 0) {
+        return nullptr;
+    }
+    // если позиция последняя в команде, то проверяем только предыдущего героя - не HeavyHero?
+    if (pos == (GetSize() - 1)) {
+        return ExtractTypeFromUnitPtr(units_.at(pos - 1)) == "HeavyHero" ? units_.at(pos - 1): nullptr;
+    }
+    // если позиция в середине команды, проверяем соседа слева и справа
+    if (ExtractTypeFromUnitPtr(units_.at(pos - 1)) == "HeavyHero") {
+        return units_.at(pos - 1);
+    } else if (ExtractTypeFromUnitPtr(units_.at(pos + 1)) == "HeavyHero") {
+        return units_.at(pos + 1);
+    }
+    return nullptr;
+}
 

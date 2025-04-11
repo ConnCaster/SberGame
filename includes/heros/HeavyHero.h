@@ -20,7 +20,7 @@ public:
 
     // методы работы с усилителями HeavyHero (которые на телеге едут)
     virtual bool HasBuff(const std::string &buff_name) const { return  false; }
-    virtual void RemoveBuff(const std::string &buff_name) {};
+    virtual HeavyHero* RemoveBuff(const std::string &buff_name) { return nullptr; }
 
 protected:
     std::unique_ptr<IAttack> attack_;
@@ -41,15 +41,7 @@ public:
 
     void DecreaseHealth(unsigned int damage) override {
         std::cout << "[HeavyHero] Defense buff " << buff_name_ << std::endl;
-        // шанс 50%, что при ударе, сила которого больше уровня защиты, бафф будет снесен
-        if (damage > protection_ && ((rand() % 100) < 50)) {
-            std::cout << "[HeavyHero] Buff " << buff_name_ << " is losed" << std::endl;
-            RemoveBuff(buff_name_);
-            inner_heavy_hero_->DecreaseHealth(damage);
-        } else {
-            std::cout << "[HeavyHero] Buff " << buff_name_ << " is saved" << std::endl;
-            inner_heavy_hero_->DecreaseHealth(damage - defense_bonus_);
-        }
+        inner_heavy_hero_->DecreaseHealth(damage - defense_bonus_);
     }
 
     bool HasBuff(const std::string &buff_name) const override {
@@ -59,12 +51,15 @@ public:
         return inner_heavy_hero_->HasBuff(buff_name);
     }
 
-    void RemoveBuff(const std::string &buff_name) override {
+    HeavyHero* RemoveBuff(const std::string &buff_name) override {
         if (buff_name_ == "Spear") attack_bonus_ = 0;
         if (buff_name == buff_name_) {
-            inner_heavy_hero_ = dynamic_cast<HeavyHeroDecorator *>(this)->inner_heavy_hero_;
+            HeavyHero* tmp = inner_heavy_hero_;
+            inner_heavy_hero_ = nullptr;
+            return tmp;
         } else {
             inner_heavy_hero_->RemoveBuff(buff_name);
+            return inner_heavy_hero_;
         }
     }
 

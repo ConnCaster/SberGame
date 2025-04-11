@@ -60,18 +60,19 @@ private:
 class ITeamBuilderFactoryM {
 public:
     static ITeamBuilder* CreateTeamBuilder(unsigned int type, const std::string team_name, unsigned int team_max_cost) {
-        switch (type) {
-            case 1: {
-                return new TeamBuilderRandom{team_name, team_max_cost};
-            }
-            case 2: {
-                return new TeamBuilderGreedy{team_name, team_max_cost};
-            }
-            case 3: {
-                // TODO: добавить третий способ генерации команды
-                return nullptr;
-            }
-        }
+        // switch (type) {
+            // case 1: {
+            //     return new TeamBuilderRandom{team_name, team_max_cost};
+            // }
+            // case 2: {
+            //     return new TeamBuilderGreedy{team_name, team_max_cost};
+            // }
+            // case 3: {
+            //     // TODO: добавить третий способ генерации команды
+            //     return nullptr;
+            // }
+        // }
+        return new TeamBuilderGreedy{team_name, team_max_cost};
     }
 };
 
