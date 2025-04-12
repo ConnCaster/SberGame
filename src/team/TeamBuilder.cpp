@@ -45,14 +45,14 @@ void TeamBuilderRandom::GenerateTeam() {
         } else {*/
         // проверяем, не был ли предыдущий герой HeavyHero
         team_->AddUnit(unit);
-        if (ExtractTypeFromUnitPtr(unit) == "Hero") {
-            IUnit* heavy_hero = team_->CheckIfHeavyHeroNeighbour(team_->GetSize() - 1);
-            if (heavy_hero) {
-                HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
-                // заменяем предпоследнего героя на героя с бафами
-                team_->ReplaceUnit(heavy_hero_with_buff, team_->GetSize() - 2);
-            }
-        }
+        // if (ExtractTypeFromUnitPtr(unit) == "Hero") {
+        //     IUnit* heavy_hero = team_->CheckIfHeavyHeroNeighbour(team_->GetSize() - 1);
+        //     if (heavy_hero) {
+        //         HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
+        //         // заменяем предпоследнего героя на героя с бафами
+        //         team_->ReplaceUnit(heavy_hero_with_buff, team_->GetSize() - 2);
+        //     }
+        // }
 //        }
         team_cost_ += unit_cost;
     }
@@ -80,14 +80,14 @@ void TeamBuilderGreedy::GenerateTeam() {
             }
             IUnit *unit = UnitFactory::CreateUnit(it->first);
             team_->AddUnit(unit);
-            if (ExtractTypeFromUnitPtr(unit) == "Hero") {
-                IUnit* heavy_hero = team_->CheckIfHeavyHeroNeighbour(team_->GetSize() - 1);
-                if (heavy_hero) {
-                    HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
-                    // заменяем предпоследнего героя на героя с бафами
-                    team_->ReplaceUnit(heavy_hero_with_buff, team_->GetSize() - 2);
-                }
-            }
+            // if (ExtractTypeFromUnitPtr(unit) == "Hero") {
+            //     IUnit* heavy_hero = team_->CheckIfHeavyHeroNeighbour(team_->GetSize() - 1);
+            //     if (heavy_hero) {
+            //         HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
+            //         // заменяем предпоследнего героя на героя с бафами
+            //         team_->ReplaceUnit(heavy_hero_with_buff, team_->GetSize() - 2);
+            //     }
+            // }
             team_cost_ += unit_cost;
         }
     }

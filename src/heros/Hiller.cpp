@@ -9,7 +9,7 @@ constexpr static unsigned int kMaxProtection = 10;
 constexpr static unsigned int kMaxDamage = 20;
 
 constexpr static unsigned int kDistance = 2;
-constexpr static unsigned int kMaxPower = 30;
+constexpr static unsigned int kMaxPower = 2;
 
 Hiller::Hiller()
         : IUnit(kMaxHealth, kMaxProtection, kMaxDamage),

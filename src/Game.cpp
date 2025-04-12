@@ -167,13 +167,9 @@ int Game::Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
         std::cout << "Hiller attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
         dynamic_cast<Hiller*>(l)->PerformAttack(r);
     } else if ((ExtractTypeFromUnitPtr(l) == "Wizard")) {
-        std::cout << "Wizard clone... " << ExtractTypeFromUnitPtr(l) << std::endl;
-        IUnit* red_cloned_unit = dynamic_cast<Wizard*>(l)->PerformSpecAction(l);
-        if (red_cloned_unit) {
-            l_team->AddUnit(red_cloned_unit);
-        }
+        std::cout << "Wizard does not have an attack ability" << std::endl;
     } else if ((ExtractTypeFromUnitPtr(l) == "Wagenburg")) {
-        std::cout << "Wageeeeenbuuuuuurggg" << std::endl;
+        std::cout << "Wagenburg does not have an attack ability" << std::endl;
     }
     l_team->ReturnUnit(l);
     if (r && r->GetHealth() == 0) {
@@ -196,9 +192,74 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
     logger_spec_acts_.Log(msg);
     for (int i = (was_killed) ? 0 : 1; i < l_team->GetSize(); ++i) {
         IUnit* unit = l_team->GetUnitByPos(i);
-        msg = "[" + ExtractTypeFromUnitPtr(unit) + "]\n";
+        // TODO: как применять специальные действия
+        if (ExtractTypeFromUnitPtr(unit) == "HeavyHero") {
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Does not have special ability\n";
+            std::cout << msg;
+            logger_spec_acts_.Log(msg);
+        } else if (ExtractTypeFromUnitPtr(unit) == "Hero") {
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Try to append buff to neighbour HeavyHero if he exists\n";
+            std::cout << msg;
+            logger_spec_acts_.Log(msg);
+
+            // Добавляем усилители HeavyHero
+            std::vector<std::pair<IUnit*, unsigned int>> heavy_heros_vec = l_team->CheckIfHeavyHeroNeighbour(l_team->GetSize() - 1);
+            for (auto& [heavy_hero, pos] : heavy_heros_vec) {
+                if (heavy_hero) {
+                    HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
+                    // заменяем героя в его позиция на героя с бафами
+                    l_team->ReplaceUnit(heavy_hero_with_buff, pos);
+                }
+            }
+
+        } else if (ExtractTypeFromUnitPtr(unit) == "Archer") {
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Does not have special ability\n";
+            std::cout << msg;
+            logger_spec_acts_.Log(msg);
+        } else if (ExtractTypeFromUnitPtr(unit) == "Hiller") {
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Try to hill unit from his team\n";
+            std::cout << msg;
+            logger_spec_acts_.Log(msg);
+            // Лечим героя из своей команды (легкого, лучника)
+            int pos = l_team->GenPosAroundUnit(i, dynamic_cast<Hiller*>(unit)->GetHillDistance());
+            IUnit* unit_to_hill = l_team->GetUnitByPos(pos);
+            if (dynamic_cast<ICanBeHilled*>(unit_to_hill) == nullptr) {
+                // если лечить нельзя
+                msg = "[" + ExtractTypeFromUnitPtr(unit_to_hill) + "] Does not have ability to be hilled\n";
+                std::cout << msg;
+                logger_spec_acts_.Log(msg);
+            } else {
+                msg = "Hiller hills... " + ExtractTypeFromUnitPtr(unit_to_hill) + "\n";
+                std::cout << msg;
+                logger_spec_acts_.Log(msg);
+                dynamic_cast<Hiller*>(unit)->PerformSpecAction(unit_to_hill);
+            }
+        } else if (ExtractTypeFromUnitPtr(unit) == "Wizard") {
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Try to clone unit from his team\n";
+            std::cout << msg;
+            logger_spec_acts_.Log(msg);
+            // Клонирование героя из своей команды (легкого, лучника, хиллера)
+            int pos = rand() % l_team->GetSize();
+            IUnit* unit_to_clone = l_team->GetUnitByPos(pos);
+            if (dynamic_cast<ICanBeCloned*>(unit_to_clone) == nullptr) {
+                // если клонировать нельзя
+                msg = "[" + ExtractTypeFromUnitPtr(unit_to_clone) + "] Does not have ability to be clonned\n";
+                std::cout << msg;
+                logger_spec_acts_.Log(msg);
+            } else {
+                msg = "Wizard clone... " + ExtractTypeFromUnitPtr(unit_to_clone) + "\n";
+                std::cout << msg;
+                logger_spec_acts_.Log(msg);
+                IUnit* cloned_unit = dynamic_cast<Wizard*>(unit)->PerformSpecAction(unit_to_clone);
+                if (cloned_unit) {
+                    l_team->AddUnitToPos(cloned_unit, i++);
+                }
+            }
+        } else if (ExtractTypeFromUnitPtr(unit) == "Wagenburg") {
+        msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Does not have special ability\n";
         std::cout << msg;
         logger_spec_acts_.Log(msg);
-        // TODO: как применять специальные действия
+
+    }
     }
 }

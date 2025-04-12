@@ -25,6 +25,7 @@ public:
     void PerformAttack(IUnit *target);
     void PerformSpecAction(IUnit *target);
 
+    unsigned int GetHillDistance() const { return distance_; }
 
 private:
 //    unsigned int power_;

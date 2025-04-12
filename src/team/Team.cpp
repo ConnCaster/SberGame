@@ -32,6 +32,10 @@ void Team::AddUnit(IUnit* unit) {
     units_.push_back(unit);
 }
 
+void Team::AddUnitToPos(IUnit* unit, unsigned int pos) {
+    units_.insert(units_.begin() + pos, unit);
+}
+
 // TODO: пока работает для получения юнита команды противника
 // для своей команды не работает из-за проблем со сдвигом distance
 IUnit* Team::GetRandomUnit(unsigned int distance) {
@@ -96,21 +100,56 @@ std::string ExtractTHeavyHeroypeFromUnitPtr(HeavyHero* unit) {
 
 }
 
-IUnit* Team::CheckIfHeavyHeroNeighbour(unsigned int pos) const {
+std::vector<std::pair<IUnit*, unsigned int>> Team::CheckIfHeavyHeroNeighbour(unsigned int pos) const {
     // если в команде один герой - у него нет соседа
     if (GetSize() == 1 || GetSize() == 0) {
-        return nullptr;
+        return {{nullptr, 0}};
     }
+    std::vector<std::pair<IUnit*, unsigned int>> res{};
     // если позиция последняя в команде, то проверяем только предыдущего героя - не HeavyHero?
     if (pos == (GetSize() - 1)) {
-        return ExtractTypeFromUnitPtr(units_.at(pos - 1)) == "HeavyHero" ? units_.at(pos - 1): nullptr;
+        if (ExtractTypeFromUnitPtr(units_.at(pos - 1)) == "HeavyHero") {
+            res.emplace_back(units_.at(pos - 1), pos-1);
+            return res;
+        } else {
+            res.emplace_back(nullptr, 0);
+            return res;
+        }
     }
     // если позиция в середине команды, проверяем соседа слева и справа
-    if (ExtractTypeFromUnitPtr(units_.at(pos - 1)) == "HeavyHero") {
-        return units_.at(pos - 1);
+    if (ExtractTypeFromUnitPtr(units_.at(pos - 1)) == "HeavyHero" && ExtractTypeFromUnitPtr(units_.at(pos + 1)) == "HeavyHero") {
+        res.emplace_back(units_.at(pos - 1), pos - 1);
+        res.emplace_back(units_.at(pos + 1), pos + 1);
+        return res;
     } else if (ExtractTypeFromUnitPtr(units_.at(pos + 1)) == "HeavyHero") {
-        return units_.at(pos + 1);
+        res.emplace_back(units_.at(pos + 1), pos + 1);
+        return res;
+    } else if (ExtractTypeFromUnitPtr(units_.at(pos - 1)) == "HeavyHero") {
+        res.emplace_back(units_.at(pos - 1), pos - 1);
+        return res;
     }
-    return nullptr;
+    return {};
 }
 
+unsigned int Team::GenPosAroundUnit(int pos, int distance) const {
+    // Определяем границы
+    int left_bound = std::max(0, pos - distance);
+    int right_bound = std::min(static_cast<int>(units_.size()) - 1, pos + distance);
+
+    // Собираем все возможные позиции, кроме текущей (pos)
+    std::vector<int> possible_positions;
+    for (int p = left_bound; p <= right_bound; ++p) {
+        if (p != pos) {
+            possible_positions.push_back(p);
+        }
+    }
+
+    // Если нет доступных позиций, возвращаем исходную
+    if (possible_positions.empty()) {
+        return pos;
+    }
+
+    // Выбираем случайную позицию из возможных
+    int random_index = rand() % possible_positions.size();
+    return possible_positions[random_index];
+}

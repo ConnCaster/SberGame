@@ -16,20 +16,23 @@ public:
     ~Team();
 
     // работа с командой юнитов: получение и возрат юнитов во время боя
-    IUnit* GetUnit();
-    IUnit* GetRandomUnit(unsigned int distance = 0);
-    IUnit* GetUnitByPos(unsigned int pos);
+    IUnit* GetUnit();  // удаляет игрока из команды
+    IUnit* GetRandomUnit(unsigned int distance = 0); // удаляет игрока из команды
+    IUnit* GetUnitByPos(unsigned int pos);  // не удаляет игрока из команды
     void ReturnUnit(IUnit* unit);
     void ReplaceUnit(IUnit* unit, unsigned int pos);
 
     void AddUnit(IUnit* unit);
+    void AddUnitToPos(IUnit* unit, unsigned int pos);
+
+    unsigned int GenPosAroundUnit(int pos, int distance) const;
 
     bool IsEmpty() const { return units_.empty(); }
     unsigned int GetSize() const { return units_.size(); }
     std::string GetTeamInfo() const;
     std::string GetTeamName() const { return team_name_; }
 
-    IUnit* CheckIfHeavyHeroNeighbour(unsigned int pos) const;
+    std::vector<std::pair<IUnit*, unsigned int>> CheckIfHeavyHeroNeighbour(unsigned int pos) const;
 
 private:
     std::deque<IUnit*> units_;

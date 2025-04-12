@@ -47,7 +47,9 @@ void Archer::SetAttack(std::unique_ptr<IAttack> attack) {
 }
 
 void Archer::Hill(unsigned int additional_health) {
+    std::cout << "[Archer] health " << health_ << " -> ";
     health_ = (health_ + additional_health > kMaxHealth) ? kMaxHealth : health_ + additional_health;
+    std::cout << health_ << std::endl;
 }
 
 void Archer::PerformAttack(IUnit *target) {
