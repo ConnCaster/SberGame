@@ -43,8 +43,13 @@ void Game::Run() {
         r = red_;
     }
     bool left_team_order = true;
+    // current_state_ = GameState::CreateWaitingState();   // !!!
+    // current_state_->Enter(*this);                    // !!!
+
     while (l && r && !l->IsEmpty() && !r->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
+        // current_state_->Update(*this);  // !!!
+
         IUnit* left_unit = l->GetUnit();
         IUnit* right_unit = r->GetUnit();
         if (left_team_order) {
@@ -76,9 +81,64 @@ void Game::Run() {
             SpecAction(l, r, is_killed_left);
             left_team_order = true;
         }
+        // if (1) {
+        //     char input;
+        //     std::cin >> input;
+        //     HandleInput(input);
+        // }
     }
     ShowGameResults();
 }
+
+void Game::ChangeState(std::unique_ptr<GameState> new_state) {
+    current_state_ = std::move(new_state);
+    current_state_->Enter(*this);
+}
+
+void Game::HandleInput(char input) {
+    if (current_state_) {
+        current_state_->HandleInput(*this, input);
+    }
+}
+
+void WaitingForInputState::Enter(Game& game) {
+    std::cout << "Waiting for input...\n";
+}
+
+void WaitingForInputState::Update(Game& game) {
+    // Ничего не делаем, ждем ввода
+}
+
+void WaitingForInputState::HandleInput(Game& game, char input) {
+    if (input == 'n') {
+        game.ChangeState(GameState::CreateProcessingState());
+    }
+}
+
+
+void ProcessingTurnState::Enter(Game& game) {
+    std::cout << "Processing turn...\n";
+}
+
+void ProcessingTurnState::Update(Game& game) {
+    // game.ProcessTurnLogic();
+    game.ChangeState(GameState::CreateWaitingState());
+}
+
+void ProcessingTurnState::HandleInput(Game& game, char input) {
+    // Игнорируем ввод
+}
+
+// Фабричные методы
+std::unique_ptr<GameState> GameState::CreateWaitingState() {
+    return std::make_unique<WaitingForInputState>();
+}
+
+std::unique_ptr<GameState> GameState::CreateProcessingState() {
+    return std::make_unique<ProcessingTurnState>();
+}
+
+
 
 int Game::SetTeamGenerationType() {
     delete red_team_builder_;

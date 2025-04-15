@@ -6,6 +6,20 @@
 #include "team/TeamBuilder.h"
 #include "logger/Logger.h"
 
+class Game;
+
+class GameState {
+public:
+    virtual ~GameState() = default;
+    virtual void Enter(Game& game) = 0;
+    virtual void Update(Game& game) = 0;
+    virtual void HandleInput(Game& game, char input) = 0;
+
+    // Фабричные методы для состояний
+    static std::unique_ptr<GameState> CreateWaitingState();
+    static std::unique_ptr<GameState> CreateProcessingState();
+};
+
 // @brief Pattern LazyInitialization
 class Game {
 public:
@@ -13,6 +27,11 @@ public:
     ~Game();
 
     void Run();
+
+// ================================
+    void ChangeState(std::unique_ptr<GameState> new_state);
+    void ProcessTurnLogic();  // Переносим сюда логику из ProcessNextTurn
+    void HandleInput(char input);
 
 private:
     int SetTeamGenerationType();
@@ -23,7 +42,6 @@ private:
 
     void ShowGameResults() const;
 
-
 private:
     Team* red_;
     Team* blue_;
@@ -32,7 +50,27 @@ private:
 
     Logger logger_death_;
     Logger logger_spec_acts_;
+// ====================================
+    std::unique_ptr<GameState> current_state_;
 };
 
+
+// =======================================
+// Реализация WaitingState
+class WaitingForInputState : public GameState {
+public:
+    void Enter(Game& game) override;
+    void Update(Game& game) override;
+    void HandleInput(Game& game, char input) override;
+};
+
+
+// Реализация ProcessingState
+class ProcessingTurnState : public GameState {
+public:
+    void Enter(Game& game) override;
+    void Update(Game& game) override;
+    void HandleInput(Game& game, char input) override;
+};
 
 #endif //SBERGAME_GAME_H
