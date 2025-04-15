@@ -42,6 +42,8 @@ private:
 
     void ShowGameResults() const;
 
+    void NextTurn();
+
 private:
     Team* red_;
     Team* blue_;
@@ -50,7 +52,9 @@ private:
 
     Logger logger_death_;
     Logger logger_spec_acts_;
-// ====================================
+
+    bool red_team_order_ = true;
+
     std::unique_ptr<GameState> current_state_;
 };
 
