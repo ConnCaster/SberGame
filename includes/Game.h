@@ -30,7 +30,9 @@ public:
 
 // ================================
     void ChangeState(std::unique_ptr<GameState> new_state);
-    void ProcessTurnLogic();  // Переносим сюда логику из ProcessNextTurn
+    void ProcessTurnLogic() {
+        NextTurn();
+    };  // Переносим сюда логику из ProcessNextTurn
     void HandleInput(char input);
 
 private:

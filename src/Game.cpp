@@ -34,9 +34,18 @@ void Game::Run() {
     } while (first_command != "red" && first_command != "blue");
 
     red_team_order_ = (first_command == "red") ? true : false;
+    //=================================================== !!!!!!!!!!!!!
+    current_state_ = GameState::CreateWaitingState();
+    current_state_->Enter(*this);
+
     while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
-        NextTurn();  // основной ход
+        current_state_->Update(*this);   // !!!!!!!!
+
+        std::cout << "Enter 'n': ";
+        char input;
+        std::cin >> input;
+        current_state_->HandleInput(*this, input);
     }
     ShowGameResults();
 }
@@ -64,6 +73,11 @@ void WaitingForInputState::Update(Game& game) {
 void WaitingForInputState::HandleInput(Game& game, char input) {
     if (input == 'n') {
         game.ChangeState(GameState::CreateProcessingState());
+    } else {
+        std::cout << "Error. Enter 'n' again: ";
+        char input;
+        std::cin >> input;
+        game.HandleInput(input);
     }
 }
 
@@ -107,7 +121,7 @@ void ProcessingTurnState::Enter(Game& game) {
 }
 
 void ProcessingTurnState::Update(Game& game) {
-    // game.ProcessTurnLogic();
+    game.ProcessTurnLogic();
     game.ChangeState(GameState::CreateWaitingState());
 }
 
