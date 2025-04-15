@@ -33,52 +33,48 @@ void Game::Run() {
         }
     } while (first_command != "red" && first_command != "blue");
 
-    Team* l = nullptr;
-    Team* r = nullptr;
-    if (first_command == "red") {
-        l = red_;
-        r = blue_;
-    } else {
-        l = blue_;
-        r = red_;
-    }
-    bool left_team_order = true;
-    while (l && r && !l->IsEmpty() && !r->IsEmpty()) {
+    red_team_order_ = (first_command == "red") ? true : false;
+    while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
-        IUnit* left_unit = l->GetUnit();
-        IUnit* right_unit = r->GetUnit();
-        if (left_team_order) {
-            // герой наносит удар
-            int is_killed_right = Attack(left_unit, l, right_unit, r);
-            int is_killed_left{0};
-            if (!is_killed_right) {
-                // если противник выжил, то он отвечает
-                left_unit = l->GetUnit();
-                right_unit = r->GetUnit();
-                is_killed_left = Attack(right_unit, r, left_unit, l);
-            }
-            // применяются специальные действия
-            SpecAction(l, r, is_killed_left);
-            SpecAction(r, l, is_killed_right);
-            left_team_order = false;
-        } else {
-            // герой наносит удар
-            int is_killed_left = Attack(right_unit, r, left_unit, l);
-            int is_killed_right{0};
-            if (!is_killed_left) {
-                // если противник выжил, то он отвечает
-                left_unit = l->GetUnit();
-                right_unit = r->GetUnit();
-                is_killed_right = Attack(left_unit, l, right_unit, r);
-            }
-            // применяются специальные действия
-            SpecAction(r, l, is_killed_right);
-            SpecAction(l, r, is_killed_left);
-            left_team_order = true;
-        }
+        NextTurn();  // основной ход
     }
     ShowGameResults();
 }
+
+void Game::NextTurn() {
+    IUnit* red_unit = red_->GetUnit();
+    IUnit* blue_unit = blue_->GetUnit();
+    if (red_team_order_) {
+        // герой красных наносит удар
+        int is_killed_blue = Attack(red_unit, red_, blue_unit, blue_);
+        int is_killed_red{0};
+        if (!is_killed_blue) {
+            // если синий противник выжил, то он отвечает
+            red_unit = red_->GetUnit();
+            blue_unit = blue_->GetUnit();
+            is_killed_red = Attack(blue_unit, blue_, red_unit, red_);
+        }
+        // применяются специальные действия
+        SpecAction(red_, blue_, is_killed_red);
+        SpecAction(blue_, red_, is_killed_blue);
+        red_team_order_ = false;
+    } else {
+        // герой синих наносит удар
+        int is_killed_red = Attack(blue_unit, blue_, red_unit, red_);
+        int is_killed_blue{0};
+        if (!is_killed_red) {
+            // если красный противник выжил, то он отвечает
+            red_unit = red_->GetUnit();
+            blue_unit = blue_->GetUnit();
+            is_killed_blue = Attack(red_unit, red_, blue_unit, blue_);
+        }
+        // применяются специальные действия
+        SpecAction(blue_, red_, is_killed_blue);
+        SpecAction(red_, blue_, is_killed_red);
+        red_team_order_ = true;
+    }
+}
+
 
 int Game::SetTeamGenerationType() {
     delete red_team_builder_;

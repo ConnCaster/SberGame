@@ -23,6 +23,7 @@ private:
 
     void ShowGameResults() const;
 
+    void NextTurn();
 
 private:
     Team* red_;
@@ -32,6 +33,8 @@ private:
 
     Logger logger_death_;
     Logger logger_spec_acts_;
+
+    bool red_team_order_ = true;
 };
 
 
