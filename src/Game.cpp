@@ -250,7 +250,6 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
         msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Does not have special ability\n";
         std::cout << msg;
         logger_spec_acts_.Log(msg);
-
-    }
+        }
     }
 }
