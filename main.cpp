@@ -15,8 +15,7 @@ int main() {
     // std::cout << "==========================" << std::endl;
     // hero->PerformAttack(heavy_hero);
 
-    Game* game = Game::GetInstance();
-    game->Run();
-    delete game;
+    Game game{};
+    game.Run();
     return 0;
 }

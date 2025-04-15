@@ -6,17 +6,15 @@
 #include "team/TeamBuilder.h"
 #include "logger/Logger.h"
 
-// @brief Pattern Singleton and LazyInitialization
+// @brief Pattern LazyInitialization
 class Game {
 public:
-    static Game* GetInstance();
+    Game();
     ~Game();
 
     void Run();
 
 private:
-    Game();
-
     int SetTeamGenerationType();
     Team* CreateTeam(ITeamBuilder* team_builder);
 
@@ -25,9 +23,8 @@ private:
 
     void ShowGameResults() const;
 
-private:
-    static Game* game_instance_;
 
+private:
     Team* red_;
     Team* blue_;
     ITeamBuilder* red_team_builder_;

@@ -2,15 +2,6 @@
 
 #include "Game.h"
 
-Game* Game::game_instance_ = nullptr;
-
-Game* Game::GetInstance() {
-    if (!game_instance_) {
-        game_instance_ = new Game{};
-    }
-    return game_instance_;
-}
-
 Game::Game()
     : red_{nullptr},
         blue_{nullptr},
