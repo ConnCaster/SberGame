@@ -11,7 +11,6 @@ class Game;
 class GameState {
 public:
     virtual ~GameState() = default;
-    virtual void Enter(Game& game) = 0;
     virtual void Update(Game& game) = 0;
     virtual void HandleInput(Game& game, char input) = 0;
 
@@ -31,8 +30,8 @@ public:
 // ================================
     void ChangeState(std::unique_ptr<GameState> new_state);
     void ProcessTurnLogic() {
-        NextTurn();
-    };  // Переносим сюда логику из ProcessNextTurn
+        Turn();
+    };
     void HandleInput(char input);
 
 private:
@@ -44,7 +43,7 @@ private:
 
     void ShowGameResults() const;
 
-    void NextTurn();
+    void Turn();
 
 private:
     Team* red_;
@@ -65,7 +64,6 @@ private:
 // Реализация WaitingState
 class WaitingForInputState : public GameState {
 public:
-    void Enter(Game& game) override;
     void Update(Game& game) override;
     void HandleInput(Game& game, char input) override;
 };
@@ -74,7 +72,6 @@ public:
 // Реализация ProcessingState
 class ProcessingTurnState : public GameState {
 public:
-    void Enter(Game& game) override;
     void Update(Game& game) override;
     void HandleInput(Game& game, char input) override;
 };

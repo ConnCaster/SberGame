@@ -8,7 +8,8 @@ Game::Game()
         red_team_builder_{nullptr},
         blue_team_builder_{nullptr},
         logger_death_(new FileLogger("./logger_deaths.log"), LogEventType::LOG_DEATHS),
-        logger_spec_acts_(new FileLogger("./logger_spec_acts.log"), LogEventType::LOG_SPEC_ACTS)
+        logger_spec_acts_(new FileLogger("./logger_spec_acts.log"), LogEventType::LOG_SPEC_ACTS),
+        current_state_{GameState::CreateWaitingState()}
 {}
 
 Game::~Game() {
@@ -33,11 +34,7 @@ void Game::Run() {
         }
     } while (first_command != "red" && first_command != "blue");
 
-    red_team_order_ = (first_command == "red") ? true : false;
-    //=================================================== !!!!!!!!!!!!!
-    current_state_ = GameState::CreateWaitingState();
-    current_state_->Enter(*this);
-
+    red_team_order_ = (first_command == "red");
     while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
         current_state_->Update(*this);   // !!!!!!!!
@@ -45,43 +42,12 @@ void Game::Run() {
         std::cout << "Enter 'n': ";
         char input;
         std::cin >> input;
-        current_state_->HandleInput(*this, input);
+        HandleInput(input);
     }
     ShowGameResults();
 }
 
-
-void Game::ChangeState(std::unique_ptr<GameState> new_state) {
-    current_state_ = std::move(new_state);
-    current_state_->Enter(*this);
-}
-
-void Game::HandleInput(char input) {
-    if (current_state_) {
-        current_state_->HandleInput(*this, input);
-    }
-}
-
-void WaitingForInputState::Enter(Game& game) {
-    std::cout << "Waiting for input...\n";
-}
-
-void WaitingForInputState::Update(Game& game) {
-    // Ничего не делаем, ждем ввода
-}
-
-void WaitingForInputState::HandleInput(Game& game, char input) {
-    if (input == 'n') {
-        game.ChangeState(GameState::CreateProcessingState());
-    } else {
-        std::cout << "Error. Enter 'n' again: ";
-        char input;
-        std::cin >> input;
-        game.HandleInput(input);
-    }
-}
-
-void Game::NextTurn() {
+void Game::Turn() {
     IUnit* red_unit = red_->GetUnit();
     IUnit* blue_unit = blue_->GetUnit();
     if (red_team_order_) {
@@ -113,29 +79,6 @@ void Game::NextTurn() {
         SpecAction(red_, blue_, is_killed_red);
         red_team_order_ = true;
     }
-}
-
-
-void ProcessingTurnState::Enter(Game& game) {
-    std::cout << "Processing turn...\n";
-}
-
-void ProcessingTurnState::Update(Game& game) {
-    game.ProcessTurnLogic();
-    game.ChangeState(GameState::CreateWaitingState());
-}
-
-void ProcessingTurnState::HandleInput(Game& game, char input) {
-    // Игнорируем ввод
-}
-
-// Фабричные методы
-std::unique_ptr<GameState> GameState::CreateWaitingState() {
-    return std::make_unique<WaitingForInputState>();
-}
-
-std::unique_ptr<GameState> GameState::CreateProcessingState() {
-    return std::make_unique<ProcessingTurnState>();
 }
 
 
@@ -312,3 +255,49 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
         }
     }
 }
+
+// @brief Pattern Fabric Method
+std::unique_ptr<GameState> GameState::CreateWaitingState() {
+    return std::make_unique<WaitingForInputState>();
+}
+
+std::unique_ptr<GameState> GameState::CreateProcessingState() {
+    return std::make_unique<ProcessingTurnState>();
+}
+
+// Работа с состояниями в самой игре
+void Game::ChangeState(std::unique_ptr<GameState> new_state) {
+    current_state_ = std::move(new_state);
+}
+
+void Game::HandleInput(char input) {
+    if (current_state_) {
+        current_state_->HandleInput(*this, input);
+    }
+}
+
+// Обработка состояния ожидания хода
+void WaitingForInputState::Update(Game& game) {
+    // Ничего не делаем, ждем ввода
+}
+
+void WaitingForInputState::HandleInput(Game& game, char input) {
+    if (input == 'n') {
+        game.ChangeState(GameState::CreateProcessingState());
+    } else {
+        std::cout << "Error. Enter 'n' again: ";
+        std::cin >> input;
+        game.HandleInput(input);
+    }
+}
+
+// Обработка состояния хода
+void ProcessingTurnState::Update(Game& game) {
+    game.ProcessTurnLogic();
+    game.ChangeState(GameState::CreateWaitingState());
+}
+
+void ProcessingTurnState::HandleInput(Game& game, char input) {
+    // Игнорируем ввод
+}
+
