@@ -8,6 +8,11 @@
 
 class Game;
 
+enum class GameMode: int {
+    StepByStep = 1,
+    FastRun = 2
+};
+
 class GameState {
 public:
     virtual ~GameState() = default;
@@ -29,9 +34,7 @@ public:
 
 // ================================
     void ChangeState(std::unique_ptr<GameState> new_state);
-    void ProcessTurnLogic() {
-        Turn();
-    };
+    void ProcessTurnLogic() { Turn(); };
     void HandleInput(char input);
 
 private:
@@ -59,6 +62,8 @@ private:
     std::unique_ptr<GameState> current_state_;
 };
 
+void ChooseFirstTurnTeam(std::string& first_team);
+GameMode ChooseGameMode();
 
 // =======================================
 // Реализация WaitingState

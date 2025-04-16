@@ -9,7 +9,7 @@ Game::Game()
         blue_team_builder_{nullptr},
         logger_death_(new FileLogger("./logger_deaths.log"), LogEventType::LOG_DEATHS),
         logger_spec_acts_(new FileLogger("./logger_spec_acts.log"), LogEventType::LOG_SPEC_ACTS),
-        current_state_{GameState::CreateWaitingState()}
+        current_state_{nullptr}
 {}
 
 Game::~Game() {
@@ -19,30 +19,51 @@ Game::~Game() {
     delete blue_team_builder_;
 }
 
+void ChooseFirstTurnTeam(std::string& first_team) {
+    do {
+        std::cout << "Enter first command [red/blue]: ";
+        std::cin >> first_team;
+        if (first_team != "red" && first_team != "blue") {
+            std::cout << "Unknown command. Try again ... \n";
+        }
+    } while (first_team != "red" && first_team != "blue");
+}
+
+GameMode ChooseGameMode() {
+    std::string game_mode{0};
+    do {
+        std::cout << "Enter mode you want to play [1-StepByStep / 2-FastRun] ";
+        std::cin >> game_mode;
+        if (game_mode != "1" && game_mode != "2") {
+            std::cout << "Unknown command. Try again ... \n";
+        }
+    } while (game_mode != "1" && game_mode != "2");
+    return (game_mode == "1") ? GameMode::StepByStep : GameMode::FastRun;
+}
+
+
 void Game::Run() {
     SetTeamGenerationType();
     std::cout << "\n==== Start game ====\n";
     red_ = CreateTeam(red_team_builder_);
     blue_ = CreateTeam(blue_team_builder_);
 
-    std::cout << "Enter first command [red/blue]: ";
-    std::string first_command{};
-    do {
-        std::cin >> first_command;
-        if (first_command != "red" && first_command != "blue") {
-            std::cout << "Unknown command. Try again [red/blue] ... ";
-        }
-    } while (first_command != "red" && first_command != "blue");
+    std::string first_team{};
+    ChooseFirstTurnTeam(first_team);
+    red_team_order_ = (first_team == "red");
 
-    red_team_order_ = (first_command == "red");
+    current_state_ = (ChooseGameMode() == GameMode::StepByStep) ? GameState::CreateWaitingState() : nullptr;
     while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
-        current_state_->Update(*this);   // !!!!!!!!
-
-        std::cout << "Enter 'n': ";
-        char input;
-        std::cin >> input;
-        HandleInput(input);
+        if (current_state_) {
+            current_state_->Update(*this);   // !!!!!!!!
+            std::cout << "Enter 'n': ";
+            char input;
+            std::cin >> input;
+            HandleInput(input);
+        } else {
+            ProcessTurnLogic();
+        }
     }
     ShowGameResults();
 }
@@ -214,7 +235,7 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
             std::cout << msg;
             logger_spec_acts_.Log(msg);
             // Лечим героя из своей команды (легкого, лучника)
-            int pos = l_team->GenPosAroundUnit(i, dynamic_cast<Hiller*>(unit)->GetHillDistance());
+            unsigned int pos = l_team->GenPosAroundUnit(i, dynamic_cast<Hiller*>(unit)->GetHillDistance());
             IUnit* unit_to_hill = l_team->GetUnitByPos(pos);
             if (dynamic_cast<ICanBeHilled*>(unit_to_hill) == nullptr) {
                 // если лечить нельзя
