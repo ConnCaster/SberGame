@@ -1,27 +1,25 @@
 #ifndef SBERGAME_GAME_H
 #define SBERGAME_GAME_H
 
-#include <iostream>
-
 #include "team/TeamBuilder.h"
 #include "logger/Logger.h"
-
-class Game;
 
 enum class GameMode: int {
     StepByStep = 1,
     FastRun = 2
 };
 
-class GameState {
+class Game;
+class IGameState {
 public:
-    virtual ~GameState() = default;
+    virtual ~IGameState() = default;
     virtual void Update(Game& game) = 0;
-    virtual void HandleInput(Game& game, char input) = 0;
+    virtual void HandleInput(Game& game, std::string& input) = 0;
 
-    // Фабричные методы для состояний
-    static std::unique_ptr<GameState> CreateWaitingState();
-    static std::unique_ptr<GameState> CreateProcessingState();
+    // @brief Pattern Fabric Method
+    // для состояний
+    static std::unique_ptr<IGameState> CreateWaitingState();
+    static std::unique_ptr<IGameState> CreateProcessingState();
 };
 
 // @brief Pattern LazyInitialization
@@ -33,9 +31,9 @@ public:
     void Run();
 
 // ================================
-    void ChangeState(std::unique_ptr<GameState> new_state);
+    void SetState(std::unique_ptr<IGameState> new_state);
     void ProcessTurnLogic() { Turn(); };
-    void HandleInput(char input);
+    // void HandleInput(std::string& input);
 
 private:
     int SetTeamGenerationType();
@@ -59,7 +57,7 @@ private:
 
     bool red_team_order_ = true;
 
-    std::unique_ptr<GameState> current_state_;
+    std::unique_ptr<IGameState> current_state_;
 };
 
 void ChooseFirstTurnTeam(std::string& first_team);
@@ -67,18 +65,18 @@ GameMode ChooseGameMode();
 
 // =======================================
 // Реализация WaitingState
-class WaitingForInputState : public GameState {
+class WaitingForInputState : public IGameState {
 public:
     void Update(Game& game) override;
-    void HandleInput(Game& game, char input) override;
+    void HandleInput(Game& game, std::string& input) override;
 };
 
 
 // Реализация ProcessingState
-class ProcessingTurnState : public GameState {
+class ProcessingTurnState : public IGameState {
 public:
     void Update(Game& game) override;
-    void HandleInput(Game& game, char input) override;
+    void HandleInput(Game& game, std::string& input) override;
 };
 
 #endif //SBERGAME_GAME_H
