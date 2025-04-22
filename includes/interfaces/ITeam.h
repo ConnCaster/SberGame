@@ -8,7 +8,7 @@ public:
     virtual IUnit* GetUnit() = 0;
     virtual IUnit* GetRandomUnit(unsigned int distance = 0) = 0;
     virtual void ReturnUnit(IUnit* unit) = 0;
-
+    virtual IUnit* GetUnitByPos(unsigned int pos) = 0;
 
     virtual bool IsEmpty() const = 0;
     virtual unsigned int GetSize() const = 0;

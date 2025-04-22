@@ -132,11 +132,29 @@ void Game::ShowGameResults() const {
         std::cout << "Blue team WIN!" << std::endl;
         std::cout << "Past units: " << blue_->GetSize() << std::endl;
         std::cout << blue_->GetTeamInfo() << std::endl;
+        TeamIterator* iter = blue_->CreateIterator();
+        int i = 0;
+        std::cout << "=======================" << std::endl;
+        while (iter->HasNext()) {
+            IUnit* unit = iter->Next();
+            std::cout << "\t[" + std::to_string(i+1) + "] " + ExtractTypeFromUnitPtr(unit) + " [index=" + std::to_string(blue_->GetHeroNumber(unit)) + "]\n\t\t" + unit->GetInfo() + "\n" << std::endl;
+            i++;
+        }
+        delete iter;
     }
     else if (blue_ && blue_->IsEmpty()) {
         std::cout << "Red team WIN!" << std::endl;
         std::cout << "Past units: " << red_->GetSize() << std::endl;
         std::cout << red_->GetTeamInfo() << std::endl;
+        TeamIterator* iter = red_->CreateIterator();
+        int i = 0;
+        std::cout << "=======================" << std::endl;
+        while (iter->HasNext()) {
+            IUnit* unit = iter->Next();
+            std::cout << "\t[" + std::to_string(i+1) + "] " + ExtractTypeFromUnitPtr(unit) + " [index=" + std::to_string(red_->GetHeroNumber(unit)) + "]\n\t\t" + unit->GetInfo() << std::endl;
+            i++;
+        }
+        delete iter;
     }
 }
 

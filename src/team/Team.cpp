@@ -10,6 +10,10 @@ Team::~Team() {
     }
 }
 
+TeamIterator* Team::CreateIterator() {
+    return new TeamIterator(this);
+}
+
 IUnit* Team::GetUnit() {
     if (!units_.empty()) {
         IUnit* unit = units_.front();

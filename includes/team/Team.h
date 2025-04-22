@@ -8,6 +8,7 @@
 #include "interfaces/IUnit.h"
 #include "interfaces/ITeam.h"
 #include "UnitFactory.h"
+#include "team/TeamIterator.h"
 
 class HeroNumberManager {
 private:
@@ -47,6 +48,8 @@ class Team : public ITeam {
 public:
     Team(const std::string& team_name);
     ~Team();
+
+    TeamIterator* CreateIterator();
 
     // работа с командой юнитов: получение и возрат юнитов во время боя
     IUnit* GetUnit();  // удаляет игрока из команды

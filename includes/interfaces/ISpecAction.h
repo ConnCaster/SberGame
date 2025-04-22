@@ -5,6 +5,7 @@
 
 #include "interfaces/IUnit.h"
 
+// @brief Pattern Strategy
 class ISpecAction {
 public:
     virtual void DoSpecAction() {};

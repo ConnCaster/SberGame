@@ -56,5 +56,5 @@ list(APPEND ${PROJECT_NAME}_SOURCES
         src/attacks/DistanceAttack.cpp
         )
 
-add_executable(SberGame ${${PROJECT_NAME}_SOURCES})
+add_executable(SberGame ${${PROJECT_NAME}_SOURCES} includes/team/TeamIterator.h)
 target_include_directories(SberGame PUBLIC includes)
