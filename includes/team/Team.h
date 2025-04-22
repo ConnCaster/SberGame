@@ -9,38 +9,6 @@
 #include "interfaces/ITeam.h"
 #include "UnitFactory.h"
 
-
-// @brief Pattern ObjectPool
-class Team : public ITeam {
-public:
-    Team(const std::string& team_name);
-    ~Team();
-
-    // работа с командой юнитов: получение и возрат юнитов во время боя
-    IUnit* GetUnit();  // удаляет игрока из команды
-    IUnit* GetRandomUnit(unsigned int distance = 0); // удаляет игрока из команды
-    IUnit* GetUnitByPos(unsigned int pos);  // не удаляет игрока из команды
-    void ReturnUnit(IUnit* unit);
-    void ReplaceUnit(IUnit* unit, unsigned int pos);
-
-    void AddUnit(IUnit* unit);
-    void AddUnitToPos(IUnit* unit, unsigned int pos);
-
-    unsigned int GenPosAroundUnit(int pos, int distance) const;
-
-    bool IsEmpty() const { return units_.empty(); }
-    unsigned int GetSize() const { return units_.size(); }
-    std::string GetTeamInfo() const;
-    std::string GetTeamName() const { return team_name_; }
-
-    std::vector<std::pair<IUnit*, unsigned int>> CheckIfHeavyHeroNeighbour(unsigned int pos) const;
-
-private:
-    std::deque<IUnit*> units_;
-    std::string team_name_;
-};
-
-/*
 class HeroNumberManager {
 private:
     std::unordered_map<IUnit*, unsigned int> hero_numbers_;
@@ -74,51 +42,38 @@ public:
     }
 };
 
-class Team {
+// @brief Pattern ObjectPool
+class Team : public ITeam {
 public:
-    Team(const std::string& team_name) : team_name_(team_name) {}
+    Team(const std::string& team_name);
+    ~Team();
 
-    // Добавляем героя с автоматическим назначением номера
-    void AddUnit(IUnit* unit) {
-        if (!number_manager_.HasNumber(unit)) {
-            number_manager_.AssignNumber(unit);
-        }
-        units_.push_back(unit);
-    }
+    // работа с командой юнитов: получение и возрат юнитов во время боя
+    IUnit* GetUnit();  // удаляет игрока из команды
+    IUnit* GetRandomUnit(unsigned int distance = 0); // удаляет игрока из команды
+    IUnit* GetUnitByPos(unsigned int pos);  // не удаляет игрока из команды
+    void ReturnUnit(IUnit* unit);
+    void ReplaceUnit(IUnit* unit, unsigned int pos);
 
-    // Добавляем героя на конкретную позицию с сохранением номера
-    void AddUnitToPos(IUnit* unit, unsigned int pos) {
-        if (pos >= units_.size()) {
-            units_.resize(pos + 1, nullptr);
-        }
-        if (!number_manager_.HasNumber(unit)) {
-            number_manager_.AssignNumber(unit);
-        }
-        units_[pos] = unit;
-    }
+    void AddUnit(IUnit* unit);
+    void AddUnitToPos(IUnit* unit, unsigned int pos);
 
-    // Получить номер героя
-    unsigned int GetHeroNumber(IUnit* unit) const {
-        return number_manager_.GetNumber(unit);
-    }
+    unsigned int GenPosAroundUnit(int pos, int distance) const;
 
-    // Удаление героя из команды (но номер сохраняется)
-    IUnit* GetUnit() {
-        if (units_.empty()) return nullptr;
-        IUnit* unit = units_.front();
-        units_.pop_front();
-        return unit;
-    }
+    bool IsEmpty() const { return units_.empty(); }
+    unsigned int GetSize() const { return units_.size(); }
+    std::string GetTeamInfo() const;
+    std::string GetTeamName() const { return team_name_; }
+    unsigned int GetHeroNumber(IUnit* unit) const;
 
-    // ... остальные методы остаются без изменений
+    std::vector<std::pair<IUnit*, unsigned int>> CheckIfHeavyHeroNeighbour(unsigned int pos) const;
 
 private:
     std::deque<IUnit*> units_;
     std::string team_name_;
-    static HeroNumberManager number_manager_;  // статический, если номера общие для всех команд
-};
 
- */
+    HeroNumberManager number_manager_;
+};
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit);
 std::string ExtractHeavyHeroTypeFromUnitPtr(HeavyHero* unit);

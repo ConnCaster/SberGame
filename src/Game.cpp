@@ -131,10 +131,12 @@ void Game::ShowGameResults() const {
     if (red_ && red_->IsEmpty()) {
         std::cout << "Blue team WIN!" << std::endl;
         std::cout << "Past units: " << blue_->GetSize() << std::endl;
+        std::cout << blue_->GetTeamInfo() << std::endl;
     }
     else if (blue_ && blue_->IsEmpty()) {
         std::cout << "Red team WIN!" << std::endl;
         std::cout << "Past units: " << red_->GetSize() << std::endl;
+        std::cout << red_->GetTeamInfo() << std::endl;
     }
 }
 

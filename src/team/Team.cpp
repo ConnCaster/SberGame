@@ -25,15 +25,30 @@ void Team::ReturnUnit(IUnit *unit) {
 
 void Team::ReplaceUnit(IUnit *unit, unsigned int pos) {
     if (pos < 0 || pos >= GetSize()) return;
+    number_manager_.RemoveHero(unit);
+    number_manager_.AssignNumber(unit);
     units_.at(pos) = unit;
 }
 
 void Team::AddUnit(IUnit* unit) {
+    if (!number_manager_.HasNumber(unit)) {
+        number_manager_.AssignNumber(unit);
+    }
     units_.push_back(unit);
 }
 
 void Team::AddUnitToPos(IUnit* unit, unsigned int pos) {
+    if (pos >= units_.size()) {
+        units_.resize(pos + 1, nullptr);
+    }
+    if (!number_manager_.HasNumber(unit)) {
+        number_manager_.AssignNumber(unit);
+    }
     units_.insert(units_.begin() + pos, unit);
+}
+
+unsigned int Team::GetHeroNumber(IUnit* unit) const {
+    return number_manager_.GetNumber(unit);
 }
 
 // TODO: пока работает для получения юнита команды противника
@@ -65,7 +80,7 @@ IUnit* Team::GetRandomUnit(unsigned int distance) {
 std::string Team::GetTeamInfo() const {
     std::string out{"Team: '" + team_name_ + "' of " + std::to_string(GetSize()) + " units\n"};
     for (int i = 0; i < units_.size(); ++i) {
-        out += "\t[" + std::to_string(i+1) + "] " + ExtractTypeFromUnitPtr(units_[i]) + "\n\t\t" + units_[i]->GetInfo() + "\n";
+        out += "\t[" + std::to_string(i+1) + "] " + ExtractTypeFromUnitPtr(units_[i]) + " [index=" + std::to_string(GetHeroNumber(units_[i])) + "]\n\t\t" + units_[i]->GetInfo() + "\n";
     }
     return out;
 }
