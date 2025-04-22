@@ -79,6 +79,7 @@ IUnit* Team::GetUnitByPos(unsigned int pos) {
 
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit) {
+    if (unit == nullptr) return "";
     if (typeid(*unit) == typeid(HeavyHero)) return "HeavyHero";
     if (typeid(*unit) == typeid(HorseDecorator)) return "HeavyHero";
     if (typeid(*unit) == typeid(SpearDecorator)) return "HeavyHero";
@@ -91,7 +92,8 @@ std::string ExtractTypeFromUnitPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(WagenburgAdapter)) return "Wagenburg";
 }
 
-std::string ExtractTHeavyHeroypeFromUnitPtr(HeavyHero* unit) {
+std::string ExtractHeavyHeroTypeFromUnitPtr(HeavyHero* unit) {
+    if (unit == nullptr) return "";
     if (typeid(*unit) == typeid(HeavyHero)) return "HeavyHero";
     if (typeid(*unit) == typeid(HorseDecorator)) return "HorseDecorator";
     if (typeid(*unit) == typeid(SpearDecorator)) return "SpearDecorator";

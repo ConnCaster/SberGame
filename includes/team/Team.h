@@ -6,11 +6,12 @@
 #include <string>
 
 #include "interfaces/IUnit.h"
+#include "interfaces/ITeam.h"
 #include "UnitFactory.h"
 
 
 // @brief Pattern ObjectPool
-class Team {
+class Team : public ITeam {
 public:
     Team(const std::string& team_name);
     ~Team();
@@ -120,5 +121,5 @@ private:
  */
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit);
-std::string ExtractTHeavyHeroypeFromUnitPtr(HeavyHero* unit);
+std::string ExtractHeavyHeroTypeFromUnitPtr(HeavyHero* unit);
 #endif //SBERGAME_TEAM_H

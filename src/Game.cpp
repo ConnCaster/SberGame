@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Game.h"
+#include "Attack.h"
 
 Game::Game()
     : red_{nullptr},
@@ -71,15 +72,17 @@ void Game::Run() {
 void Game::Turn() {
     IUnit* red_unit = red_->GetUnit();
     IUnit* blue_unit = blue_->GetUnit();
+    AttackFacade attack_facade_red{red_, blue_, &logger_death_};
+    AttackFacade attack_facade_blue{blue_, red_, &logger_death_};
     if (red_team_order_) {
         // герой красных наносит удар
-        int is_killed_blue = Attack(red_unit, red_, blue_unit, blue_);
+        int is_killed_blue = attack_facade_red.Attack(red_unit, blue_unit);
         int is_killed_red{0};
         if (!is_killed_blue) {
             // если синий противник выжил, то он отвечает
             red_unit = red_->GetUnit();
             blue_unit = blue_->GetUnit();
-            is_killed_red = Attack(blue_unit, blue_, red_unit, red_);
+            is_killed_red = attack_facade_blue.Attack(blue_unit, red_unit);
         }
         // применяются специальные действия
         SpecAction(red_, blue_, is_killed_red);
@@ -87,13 +90,13 @@ void Game::Turn() {
         red_team_order_ = false;
     } else {
         // герой синих наносит удар
-        int is_killed_red = Attack(blue_unit, blue_, red_unit, red_);
+        int is_killed_red =  attack_facade_blue.Attack(blue_unit, red_unit);
         int is_killed_blue{0};
         if (!is_killed_red) {
             // если красный противник выжил, то он отвечает
             red_unit = red_->GetUnit();
             blue_unit = blue_->GetUnit();
-            is_killed_blue = Attack(red_unit, red_, blue_unit, blue_);
+            is_killed_blue = attack_facade_red.Attack(red_unit, blue_unit);
         }
         // применяются специальные действия
         SpecAction(blue_, red_, is_killed_blue);
@@ -133,71 +136,6 @@ void Game::ShowGameResults() const {
         std::cout << "Red team WIN!" << std::endl;
         std::cout << "Past units: " << red_->GetSize() << std::endl;
     }
-}
-
-// TODO: доработать механику боя
-//  1. Archer бьет на расстоянии (выбирать оппонента, получать расстояние до него, атаковать по возможности)
-//       - выбирать оппонента и получить расстояние до него:
-//       В Team сделан метод GetRandomUnit(), возвращающий итератор на юнит из команды и его позицию от начала команды
-//       Этот метод можно использовать как для атаки Archer, так и для клонирования и лечения.
-//       Работает с обоими командами.
-//  2. Hiller лечит и бьет палкой (выбирать, кого лечить, вычислять расстояние, лечить, что за палка и когда??)
-//  3. Wizard клонирует (...)
-int Game::Attack(IUnit* l, Team* l_team, IUnit* r, Team* r_team) {
-    // сбиваем защиту HeavyHero с вероятностью 50%
-    if (ExtractTypeFromUnitPtr(r) == "HeavyHero") {
-        std::string buff_type = ExtractTHeavyHeroypeFromUnitPtr(dynamic_cast<HeavyHero*>(r));
-        if (buff_type == "HorseDecorator" ||
-                buff_type == "SpearDecorator" ||
-                buff_type == "ShieldDecorator" ||
-                buff_type == "HelmetDecorator"
-                ) {
-            if ((rand() % 100) < 50) {
-                std::cout << "[HeavyHero] Buff " << buff_type << " is losed" << std::endl;
-                r = dynamic_cast<HeavyHeroDecorator*>(r)->RemoveBuff(buff_type);
-            } else {
-                std::cout << "[HeavyHero] Buff " << buff_type << " is saved" << std::endl;
-            }
-        }
-    }
-    std::cout << "[" << l_team->GetTeamName() << "] ";
-    if (ExtractTypeFromUnitPtr(l) == "HeavyHero") {
-        std::cout << "HeavyHero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
-        dynamic_cast<HeavyHero*>(l)->PerformAttack(r);
-    } else if ((ExtractTypeFromUnitPtr(l) == "Hero")) {
-        std::cout << "Hero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
-        dynamic_cast<Hero*>(l)->PerformAttack(r);
-    } else if ((ExtractTypeFromUnitPtr(l) == "Archer")) {
-        std::cout << "Archer attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
-
-        r_team->ReturnUnit(r);
-        IUnit* far_unit = r_team->GetRandomUnit(dynamic_cast<Archer*>(l)->distance_);
-        if (far_unit) {
-            dynamic_cast<Archer*>(l)->PerformAttack(far_unit);
-            r = far_unit;
-        }
-
-    } else if ((ExtractTypeFromUnitPtr(l) == "Hiller")) {
-        std::cout << "Hiller attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
-        dynamic_cast<Hiller*>(l)->PerformAttack(r);
-    } else if ((ExtractTypeFromUnitPtr(l) == "Wizard")) {
-        std::cout << "Wizard does not have an attack ability" << std::endl;
-    } else if ((ExtractTypeFromUnitPtr(l) == "Wagenburg")) {
-        std::cout << "Wagenburg does not have an attack ability" << std::endl;
-    }
-    l_team->ReturnUnit(l);
-    if (r && r->GetHealth() == 0) {
-        std::cout << "\tFINISH HIM!!!" << std::endl;
-        std::string msg = "[" + r_team->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " was killed\n";
-        logger_death_.Log(msg);
-        delete r;
-        return 1;
-    } else {
-        if (r) {
-            r_team->ReturnUnit(r);
-        }
-    }
-    return 0;
 }
 
 void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
