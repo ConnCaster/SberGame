@@ -10,7 +10,7 @@
 class HeavyHero : public IUnit {
 public:
     HeavyHero();
-    ~HeavyHero() override = default;
+    virtual ~HeavyHero() override = default;
 
     void DecreaseHealth(unsigned int damage) override;
 
@@ -40,6 +40,8 @@ public:
     HeavyHeroDecorator(HeavyHero* hero, const std::string &buff_name, int attack, int defense)
         : inner_heavy_hero_(hero), buff_name_(buff_name), attack_bonus_(attack), defense_bonus_(defense) {
     }
+
+    virtual ~HeavyHeroDecorator() = default;
 
     void DecreaseHealth(unsigned int damage) override {
         std::cout << "[HeavyHero] Defense buff " << buff_name_ << std::endl;
@@ -93,6 +95,8 @@ class HorseDecorator : public HeavyHeroDecorator {
 public:
     HorseDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Horse", 0, 5) {}
+
+    virtual ~HorseDecorator() = default;
 };
 
 class SpearDecorator : public HeavyHeroDecorator {
@@ -108,18 +112,24 @@ public:
             std::cout << "[HeavyHero] There is no attack set. Abort..." << std::endl;
         }
     }
+
+    virtual ~SpearDecorator() = default;
 };
 
 class ShieldDecorator : public HeavyHeroDecorator {
 public:
     ShieldDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Shield", 0, 8) {}
+
+    virtual ~ShieldDecorator() = default;
 };
 
 class HelmetDecorator : public HeavyHeroDecorator {
 public:
     HelmetDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Helmet", 0, 3) {}
+
+    virtual ~HelmetDecorator() = default;
 };
 
 HeavyHero* AppendBuffToHeavyHero(HeavyHero* heavy_hero);

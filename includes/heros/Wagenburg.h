@@ -24,7 +24,9 @@ public:
         : IUnit(wagenburg->GetHealth(), 0, 0), wagenburg_(wagenburg)
     {}
 
-    ~WagenburgAdapter() = default;
+    ~WagenburgAdapter() {
+        delete wagenburg_;
+    };
 
     void DecreaseHealth(unsigned int damage) {
         wagenburg_->GetShoot(damage);
