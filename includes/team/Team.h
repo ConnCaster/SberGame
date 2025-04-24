@@ -10,6 +10,8 @@
 #include "UnitFactory.h"
 #include "team/TeamIterator.h"
 
+std::string ExtractTypeFromUnitPtr(IUnit* unit);
+
 class HeroNumberManager {
 private:
     std::unordered_map<IUnit*, unsigned int> hero_numbers_;
@@ -25,16 +27,35 @@ public:
 
     // Получить номер героя
     unsigned int GetNumber(IUnit* hero) const {
+        if (
+            dynamic_cast<HeavyHero*>(hero) &&
+            ExtractHeavyHeroTypeFromUnitPtr(dynamic_cast<HeavyHero*>(hero)) != "HeavyHero"
+            ) {
+            hero = dynamic_cast<HeavyHeroDecorator*>(hero)->GetInnerHeavyHeroOrigin();
+        }
         auto it = hero_numbers_.find(hero);
         if (it != hero_numbers_.end()) {
             return it->second;
         }
-        return 0;  // или бросить исключение, если герой не найден
+        return 0;
     }
 
     // Удалить героя из системы (но номер останется занятым)
     void RemoveHero(IUnit* hero) {
         hero_numbers_.erase(hero);
+    }
+
+    // Заменить героя, сохранив его номер
+    void ReplaceHero(IUnit* prev_hero, IUnit* new_hero) {
+        if (
+            dynamic_cast<HeavyHero*>(prev_hero) &&
+            ExtractHeavyHeroTypeFromUnitPtr(dynamic_cast<HeavyHero*>(prev_hero)) == "HeavyHero"
+            ) {
+            return;
+        }
+        unsigned int prev_number = hero_numbers_[prev_hero];
+        hero_numbers_.erase(prev_hero);
+        hero_numbers_[new_hero] = prev_number;
     }
 
     // Проверить, есть ли номер у героя
@@ -77,7 +98,4 @@ private:
 
     HeroNumberManager number_manager_;
 };
-
-std::string ExtractTypeFromUnitPtr(IUnit* unit);
-std::string ExtractHeavyHeroTypeFromUnitPtr(HeavyHero* unit);
 #endif //SBERGAME_TEAM_H

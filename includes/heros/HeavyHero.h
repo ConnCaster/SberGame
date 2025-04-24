@@ -26,6 +26,8 @@ protected:
     std::unique_ptr<IAttack> attack_;
 };
 
+std::string ExtractHeavyHeroTypeFromUnitPtr(HeavyHero* unit);
+
 // @brief Pattern Decorator
 class HeavyHeroDecorator : public HeavyHero {
 protected:
@@ -66,7 +68,26 @@ public:
     virtual void PerformAttack(IUnit *target) {
         inner_heavy_hero_->PerformAttack(target);
     }
+
+    HeavyHero* GetInnerHeavyHeroDecorator() {
+        return inner_heavy_hero_;
+    }
+
+    HeavyHero* GetInnerHeavyHeroOrigin() {
+        HeavyHero* inner_unit{nullptr};
+        HeavyHero* tmp_unit{inner_heavy_hero_};
+        if (ExtractHeavyHeroTypeFromUnitPtr(tmp_unit) == "HeavyHero") {
+            return tmp_unit;
+        }
+        while (dynamic_cast<HeavyHeroDecorator*>(tmp_unit)->GetInnerHeavyHeroDecorator()) {
+            inner_unit = dynamic_cast<HeavyHeroDecorator*>(tmp_unit)->GetInnerHeavyHeroDecorator();
+            tmp_unit = inner_unit;
+            if (ExtractHeavyHeroTypeFromUnitPtr(inner_unit) == "HeavyHero") break;
+        }
+        return inner_unit;
+    }
 };
+
 
 class HorseDecorator : public HeavyHeroDecorator {
 public:

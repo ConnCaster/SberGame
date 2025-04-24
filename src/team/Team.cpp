@@ -29,8 +29,11 @@ void Team::ReturnUnit(IUnit *unit) {
 
 void Team::ReplaceUnit(IUnit *unit, unsigned int pos) {
     if (pos < 0 || pos >= GetSize()) return;
-    number_manager_.RemoveHero(unit);
-    number_manager_.AssignNumber(unit);
+    IUnit* tmp_unit{unit};
+    if (dynamic_cast<HeavyHeroDecorator*>(tmp_unit) != nullptr) {
+        tmp_unit = dynamic_cast<HeavyHeroDecorator*>(tmp_unit)->GetInnerHeavyHeroOrigin();
+    }
+    number_manager_.ReplaceHero(tmp_unit, unit);
     units_.at(pos) = unit;
 }
 
