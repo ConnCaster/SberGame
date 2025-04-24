@@ -56,8 +56,8 @@ private:
     ITeamBuilder* team_builder_;
 };
 
-// @brief Pattern FactoryMethod
-class ITeamBuilderFactoryM {
+// @brief Pattern Factory
+class ITeamBuilderFactory {
 public:
     static ITeamBuilder* CreateTeamBuilder(unsigned int type, const std::string team_name, unsigned int team_max_cost) {
         switch (type) {

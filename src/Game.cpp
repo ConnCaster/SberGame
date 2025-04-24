@@ -115,8 +115,8 @@ int Game::SetTeamGenerationType() {
     unsigned int team_max_cost{0};
     std::cin >> team_max_cost;
 
-    red_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, "Red", team_max_cost);
-    blue_team_builder_ = ITeamBuilderFactoryM::CreateTeamBuilder(type, "Blue", team_max_cost);
+    red_team_builder_ = ITeamBuilderFactory::CreateTeamBuilder(type, "Red", team_max_cost);
+    blue_team_builder_ = ITeamBuilderFactory::CreateTeamBuilder(type, "Blue", team_max_cost);
     return 0;
 }
 

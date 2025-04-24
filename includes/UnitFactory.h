@@ -12,7 +12,7 @@
 #include "heros/Wizard.h"
 #include "heros/Wagenburg.h"
 
-// @brief Pattern FactoryMethod
+// @brief Pattern Factory
 class UnitFactory {
 public:
     static IUnit* CreateUnit(const std::string& hero_type);
