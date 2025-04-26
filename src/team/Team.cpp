@@ -1,7 +1,7 @@
 #include <team/Team.h>
 
 Team::Team(const std::string& team_name)
-    : units_{}, team_name_(team_name)
+    : units_{}, team_name_(team_name), number_manager_(new UnitNumberManager)
 {}
 
 Team::~Team() {
@@ -33,13 +33,13 @@ void Team::ReplaceUnit(IUnit *unit, unsigned int pos) {
     if (dynamic_cast<HeavyHeroDecorator*>(tmp_unit) != nullptr) {
         tmp_unit = dynamic_cast<HeavyHeroDecorator*>(tmp_unit)->GetInnerHeavyHeroOrigin();
     }
-    number_manager_.ReplaceHero(tmp_unit, unit);
+    number_manager_->ReplaceHero(tmp_unit, unit);
     units_.at(pos) = unit;
 }
 
 void Team::AddUnit(IUnit* unit) {
-    if (!number_manager_.HasNumber(unit)) {
-        number_manager_.AssignNumber(unit);
+    if (!number_manager_->HasNumber(unit)) {
+        number_manager_->AssignNumber(unit);
     }
     units_.push_back(unit);
 }
@@ -48,14 +48,14 @@ void Team::AddUnitToPos(IUnit* unit, unsigned int pos) {
     if (pos >= units_.size()) {
         units_.resize(pos + 1, nullptr);
     }
-    if (!number_manager_.HasNumber(unit)) {
-        number_manager_.AssignNumber(unit);
+    if (!number_manager_->HasNumber(unit)) {
+        number_manager_->AssignNumber(unit);
     }
     units_.insert(units_.begin() + pos, unit);
 }
 
 unsigned int Team::GetHeroNumber(IUnit* unit) const {
-    return number_manager_.GetNumber(unit);
+    return number_manager_->GetNumber(unit);
 }
 
 // TODO: пока работает для получения юнита команды противника
@@ -112,6 +112,7 @@ std::string ExtractTypeFromUnitPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(Hiller)) return "Hiller";
     if (typeid(*unit) == typeid(Wizard)) return "Wizard";
     if (typeid(*unit) == typeid(WagenburgAdapter)) return "Wagenburg";
+    return "";
 }
 
 std::string ExtractHeavyHeroTypeFromUnitPtr(HeavyHero* unit) {
@@ -121,7 +122,7 @@ std::string ExtractHeavyHeroTypeFromUnitPtr(HeavyHero* unit) {
     if (typeid(*unit) == typeid(SpearDecorator)) return "SpearDecorator";
     if (typeid(*unit) == typeid(ShieldDecorator)) return "ShieldDecorator";
     if (typeid(*unit) == typeid(HelmetDecorator)) return "HelmetDecorator";
-
+    return "";
 }
 
 std::vector<std::pair<IUnit*, unsigned int>> Team::CheckIfHeavyHeroNeighbour(unsigned int pos) const {

@@ -14,7 +14,7 @@ public:
 
 class TeamBuilderRandom : public ITeamBuilder {
 public:
-    TeamBuilderRandom(const std::string team_name, unsigned int team_cost_max)
+    TeamBuilderRandom(const std::string& team_name, unsigned int team_cost_max)
             : team_{new Team{team_name}}, team_cost_{0}, team_cost_max{team_cost_max} {}
     ~TeamBuilderRandom() = default;
 
@@ -29,7 +29,7 @@ private:
 
 class TeamBuilderGreedy : public ITeamBuilder {
 public:
-    TeamBuilderGreedy(const std::string team_name, unsigned int team_cost_max)
+    TeamBuilderGreedy(const std::string& team_name, unsigned int team_cost_max)
             : team_{new Team{team_name}}, team_cost_{0}, team_cost_max{team_cost_max} {}
     ~TeamBuilderGreedy() = default;
 
@@ -69,6 +69,9 @@ public:
             }
             case 3: {
                 // TODO: добавить третий способ генерации команды
+                return nullptr;
+            }
+            default:{
                 return nullptr;
             }
         }

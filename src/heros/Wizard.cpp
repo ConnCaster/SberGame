@@ -42,5 +42,6 @@ IUnit* Wizard::PerformSpecAction(IUnit *target) {
         return dynamic_cast<CloneSpecAction*>(spec_action_.get())->GetClonedHero();
     } else {
         std::cout << "[Hiller] There is no special actions set. Abort..." << std::endl;
+        return nullptr;
     }
 }

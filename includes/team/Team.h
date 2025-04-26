@@ -2,67 +2,17 @@
 #define SBERGAME_TEAM_H
 
 #include <deque>
-#include <unordered_map>
 #include <string>
 
 #include "interfaces/IUnit.h"
 #include "interfaces/ITeam.h"
 #include "UnitFactory.h"
 #include "team/TeamIterator.h"
+#include "team/UnitNumberManager.h"
 
 std::string ExtractTypeFromUnitPtr(IUnit* unit);
 
-class HeroNumberManager {
-private:
-    std::unordered_map<IUnit*, unsigned int> hero_numbers_;
-    unsigned int next_number_ = 1;  // начинаем нумерацию с 1
-
-public:
-    // Назначить новый номер герою
-    unsigned int AssignNumber(IUnit* hero) {
-        unsigned int number = next_number_++;
-        hero_numbers_[hero] = number;
-        return number;
-    }
-
-    // Получить номер героя
-    unsigned int GetNumber(IUnit* hero) const {
-        if (
-            dynamic_cast<HeavyHero*>(hero) &&
-            ExtractHeavyHeroTypeFromUnitPtr(dynamic_cast<HeavyHero*>(hero)) != "HeavyHero"
-            ) {
-            hero = dynamic_cast<HeavyHeroDecorator*>(hero)->GetInnerHeavyHeroOrigin();
-        }
-        auto it = hero_numbers_.find(hero);
-        if (it != hero_numbers_.end()) {
-            return it->second;
-        }
-        return 0;
-    }
-
-    // Удалить героя из системы (но номер останется занятым)
-    void RemoveHero(IUnit* hero) {
-        hero_numbers_.erase(hero);
-    }
-
-    // Заменить героя, сохранив его номер
-    void ReplaceHero(IUnit* prev_hero, IUnit* new_hero) {
-        if (
-            dynamic_cast<HeavyHero*>(prev_hero) &&
-            ExtractHeavyHeroTypeFromUnitPtr(dynamic_cast<HeavyHero*>(prev_hero)) == "HeavyHero"
-            ) {
-            return;
-        }
-        unsigned int prev_number = hero_numbers_[prev_hero];
-        hero_numbers_.erase(prev_hero);
-        hero_numbers_[new_hero] = prev_number;
-    }
-
-    // Проверить, есть ли номер у героя
-    bool HasNumber(IUnit* hero) const {
-        return hero_numbers_.count(hero) > 0;
-    }
-};
+class IUnitNumberManager;
 
 // @brief Pattern ObjectPool
 class Team : public ITeam {
@@ -96,6 +46,6 @@ private:
     std::deque<IUnit*> units_;
     std::string team_name_;
 
-    HeroNumberManager number_manager_;
+    IUnitNumberManager* number_manager_;
 };
 #endif //SBERGAME_TEAM_H

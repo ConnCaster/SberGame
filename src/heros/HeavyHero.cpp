@@ -48,6 +48,7 @@ std::string ExtractHeavyHeroTypeFromPtr(IUnit* unit) {
     if (typeid(*unit) == typeid(SpearDecorator)) return "SpearDecorator";
     if (typeid(*unit) == typeid(ShieldDecorator)) return "ShieldDecorator";
     if (typeid(*unit) == typeid(HelmetDecorator)) return "HelmetDecorator";
+    return "";
 }
 
 HeavyHero* AppendBuffToHeavyHero(HeavyHero* heavy_hero) {

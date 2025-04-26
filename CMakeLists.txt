@@ -30,14 +30,15 @@ set(CMAKE_CXX_STANDARD 20)
 #
 #        includes/attaks/NormalAttack.h
 #        includes/attacks/DistanceAttack.h
+#
+#        includes/team/TeamIterator.h
+#        includes/team/UnitNumberManager.h
 #)
 
 list(APPEND ${PROJECT_NAME}_SOURCES
         main.cpp
         src/Game.cpp
         src/UnitFactory.cpp
-        src/team/Team.cpp
-        src/team/TeamBuilder.cpp
         src/Attack.cpp
 
         src/logger/Logger.cpp
@@ -54,7 +55,13 @@ list(APPEND ${PROJECT_NAME}_SOURCES
 
         src/attacks/NormalAttack.cpp
         src/attacks/DistanceAttack.cpp
+
+        src/team/Team.cpp
+        src/team/TeamBuilder.cpp
+        src/team/UnitNumberManager.cpp
         )
 
-add_executable(SberGame ${${PROJECT_NAME}_SOURCES} includes/team/TeamIterator.h)
+add_executable(SberGame ${${PROJECT_NAME}_SOURCES}
+
+)
 target_include_directories(SberGame PUBLIC includes)
