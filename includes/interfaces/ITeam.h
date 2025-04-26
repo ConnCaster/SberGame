@@ -14,6 +14,8 @@ public:
     virtual unsigned int GetSize() const = 0;
     virtual std::string GetTeamInfo() const = 0;
     virtual std::string GetTeamName() const = 0;
+
+    virtual unsigned int GetHeroNumber(IUnit* unit) const = 0;
 };
 
 

@@ -22,33 +22,36 @@ int AttackFacade::Attack(IUnit* l, IUnit* r) {
     }
     std::cout << "[" << l_team_->GetTeamName() << "] ";
     if (ExtractTypeFromUnitPtr(l) == "HeavyHero") {
-        std::cout << "HeavyHero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
+        std::cout << "HeavyHero [index=" << l_team_->GetHeroNumber(l) << "] attacks... " << ExtractTypeFromUnitPtr(r) << " [index=" << r_team_->GetHeroNumber(r) << "]" << std::endl;
         dynamic_cast<HeavyHero*>(l)->PerformAttack(r);
     } else if ((ExtractTypeFromUnitPtr(l) == "Hero")) {
-        std::cout << "Hero attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
+        std::cout << "Hero [index=" << l_team_->GetHeroNumber(l) << "] attacks... " << ExtractTypeFromUnitPtr(r)<< " [index=" << r_team_->GetHeroNumber(r) << "]" << std::endl;
         dynamic_cast<Hero*>(l)->PerformAttack(r);
     } else if ((ExtractTypeFromUnitPtr(l) == "Archer")) {
-        std::cout << "Archer attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
+        std::cout << "Archer [index=" << l_team_->GetHeroNumber(l) << "] attacks... ";
 
         r_team_->ReturnUnit(r);
         IUnit* far_unit = r_team_->GetRandomUnit(dynamic_cast<Archer*>(l)->distance_);
         if (far_unit) {
+            std::cout << ExtractTypeFromUnitPtr(r) << " [index=" << r_team_->GetHeroNumber(r) << "]" << std::endl;
             dynamic_cast<Archer*>(l)->PerformAttack(far_unit);
             r = far_unit;
+        } else {
+            std::cout << "Error getting enemy" << std::endl;
         }
 
     } else if ((ExtractTypeFromUnitPtr(l) == "Hiller")) {
-        std::cout << "Hiller attacks... " << ExtractTypeFromUnitPtr(r) << std::endl;
+        std::cout << "Hiller [index=" << l_team_->GetHeroNumber(l) << "] attacks... " << ExtractTypeFromUnitPtr(r) << " [index=" << r_team_->GetHeroNumber(r) << "]" << std::endl;
         dynamic_cast<Hiller*>(l)->PerformAttack(r);
     } else if ((ExtractTypeFromUnitPtr(l) == "Wizard")) {
-        std::cout << "Wizard does not have an attack ability" << std::endl;
+        std::cout << "Wizard [index=" << l_team_->GetHeroNumber(l) << "] does not have an attack ability" << std::endl;
     } else if ((ExtractTypeFromUnitPtr(l) == "Wagenburg")) {
-        std::cout << "Wagenburg does not have an attack ability" << std::endl;
+        std::cout << "Wagenburg [index=" << l_team_->GetHeroNumber(l) << "] does not have an attack ability" << std::endl;
     }
     l_team_->ReturnUnit(l);
     if (r && r->GetHealth() == 0) {
         std::cout << "\tFINISH HIM!!!" << std::endl;
-        std::string msg = "[" + r_team_->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " was killed\n";
+        std::string msg = "[" + r_team_->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " [index=" + std::to_string(r_team_->GetHeroNumber(r)) + "] was killed\n";
         logger_->Log(msg);
         delete r;
         return 1;

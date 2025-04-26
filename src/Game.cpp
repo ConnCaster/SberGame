@@ -157,7 +157,7 @@ void Game::ShowGameResults() const {
         delete iter;
     }
 }
-
+// "[index=" << l_team_->GetHeroNumber(l) << "]"
 void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
     std::string msg = "[" + l_team->GetTeamName() + "] use SpecActions via [" + r_team->GetTeamName() + "]\n";
     std::cout << msg;
@@ -166,13 +166,12 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
         IUnit* unit = l_team->GetUnitByPos(i);
         // TODO: как применять специальные действия
         if (ExtractTypeFromUnitPtr(unit) == "HeavyHero") {
-            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Does not have special ability\n";
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [" + std::to_string(l_team->GetHeroNumber(unit)) + "] Does not have special ability\n";
             std::cout << msg;
             logger_spec_acts_.Log(msg);
         } else if (ExtractTypeFromUnitPtr(unit) == "Hero") {
-            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Try to append buff to neighbour HeavyHero if he exists\n";
-            std::cout << msg;
-            logger_spec_acts_.Log(msg);
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Try to append buff to neighbour HeavyHero if he exists\n";
+
 
             // Добавляем усилители HeavyHero
             std::vector<std::pair<IUnit*, unsigned int>> heavy_heros_vec = l_team->CheckIfHeavyHeroNeighbour(l_team->GetSize() - 1);
@@ -181,15 +180,20 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
                     HeavyHero* heavy_hero_with_buff = AppendBuffToHeavyHero(dynamic_cast<HeavyHero*>(heavy_hero));
                     // заменяем героя в его позиция на героя с бафами
                     l_team->ReplaceUnit(heavy_hero_with_buff, pos);
+                    msg += "Buff [" + ExtractHeavyHeroTypeFromUnitPtr(heavy_hero_with_buff) + "] was added successfully to [HeavyHero] [index=" + std::to_string(l_team->GetHeroNumber(heavy_hero_with_buff)) + "]\n";
+                } else {
+
                 }
             }
+            std::cout << msg;
+            logger_spec_acts_.Log(msg);
 
         } else if (ExtractTypeFromUnitPtr(unit) == "Archer") {
-            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Does not have special ability\n";
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Does not have special ability\n";
             std::cout << msg;
             logger_spec_acts_.Log(msg);
         } else if (ExtractTypeFromUnitPtr(unit) == "Hiller") {
-            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Try to hill unit from his team\n";
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Try to hill unit from his team\n";
             std::cout << msg;
             logger_spec_acts_.Log(msg);
             // Лечим героя из своей команды (легкого, лучника)
@@ -197,17 +201,17 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
             IUnit* unit_to_hill = l_team->GetUnitByPos(pos);
             if (dynamic_cast<ICanBeHilled*>(unit_to_hill) == nullptr) {
                 // если лечить нельзя
-                msg = "[" + ExtractTypeFromUnitPtr(unit_to_hill) + "] Does not have ability to be hilled\n";
+                msg = "[" + ExtractTypeFromUnitPtr(unit_to_hill) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit_to_hill)) + "] Does not have ability to be hilled\n";
                 std::cout << msg;
                 logger_spec_acts_.Log(msg);
             } else {
-                msg = "Hiller hills... " + ExtractTypeFromUnitPtr(unit_to_hill) + "\n";
+                msg = "Hiller  [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] hills... " + ExtractTypeFromUnitPtr(unit_to_hill) + " [index=" + std::to_string(l_team->GetHeroNumber(unit_to_hill)) + "]\n";
                 std::cout << msg;
                 logger_spec_acts_.Log(msg);
                 dynamic_cast<Hiller*>(unit)->PerformSpecAction(unit_to_hill);
             }
         } else if (ExtractTypeFromUnitPtr(unit) == "Wizard") {
-            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Try to clone unit from his team\n";
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Try to clone unit from his team\n";
             std::cout << msg;
             logger_spec_acts_.Log(msg);
             // Клонирование героя из своей команды (легкого, лучника, хиллера)
@@ -215,11 +219,11 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
             IUnit* unit_to_clone = l_team->GetUnitByPos(pos);
             if (dynamic_cast<ICanBeCloned*>(unit_to_clone) == nullptr) {
                 // если клонировать нельзя
-                msg = "[" + ExtractTypeFromUnitPtr(unit_to_clone) + "] Does not have ability to be clonned\n";
+                msg = "[" + ExtractTypeFromUnitPtr(unit_to_clone) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit_to_clone)) + "] Does not have ability to be clonned\n";
                 std::cout << msg;
                 logger_spec_acts_.Log(msg);
             } else {
-                msg = "Wizard clone... " + ExtractTypeFromUnitPtr(unit_to_clone) + "\n";
+                msg = "Wizard [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] clone... " + ExtractTypeFromUnitPtr(unit_to_clone) + "\n";
                 std::cout << msg;
                 logger_spec_acts_.Log(msg);
                 IUnit* cloned_unit = dynamic_cast<Wizard*>(unit)->PerformSpecAction(unit_to_clone);
@@ -228,7 +232,7 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
                 }
             }
         } else if (ExtractTypeFromUnitPtr(unit) == "Wagenburg") {
-        msg = "[" + ExtractTypeFromUnitPtr(unit) + "] Does not have special ability\n";
+        msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Does not have special ability\n";
         std::cout << msg;
         logger_spec_acts_.Log(msg);
         }
