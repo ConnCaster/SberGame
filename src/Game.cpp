@@ -8,8 +8,8 @@ Game::Game()
         blue_{nullptr},
         red_team_builder_{nullptr},
         blue_team_builder_{nullptr},
-        logger_death_(new FileLogger("./logger_deaths.log"), LogEventType::LOG_DEATHS),
-        logger_spec_acts_(new FileLogger("./logger_spec_acts.log"), LogEventType::LOG_SPEC_ACTS),
+        logger_death_(new FileLogger("./logger_deaths.log")),
+        logger_spec_acts_(new FileLogger("./logger_spec_acts.log")),
         current_state_{nullptr}
 {}
 
@@ -52,6 +52,16 @@ void Game::Run() {
     std::string first_team{};
     ChooseFirstTurnTeam(first_team);
     red_team_order_ = (first_team == "red");
+
+    // TODO: Паттерн Observer и Bridge
+    // 1. Делаем класс, который должен
+    //      - хранить состояние системы логирования - "лог всего по умолчанию" / "лог по запросу"
+    //      - сконструировать логгеры в начале игры
+    //      - реализовать оповещение логгеров о новых сообщениях
+    // 2. Сделать метод AddLogMsg(std::string msg, int logger_type);  <-- мост
+    //      -  внутри этого метода спросить пользователя, хочет ли он логгировать событие.
+    //          Если да, то оповестить конкретный логгер в зависимости от logger_type
+    //          Если нет, никого не оповещать и проигнорировать логгирование события
 
     current_state_ = (ChooseGameMode() == GameMode::StepByStep) ? IGameState::CreateWaitingState() : nullptr;
     while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
@@ -159,7 +169,7 @@ void Game::ShowGameResults() const {
 }
 // "[index=" << l_team_->GetHeroNumber(l) << "]"
 void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
-    std::string msg = "[" + l_team->GetTeamName() + "] use SpecActions via [" + r_team->GetTeamName() + "]\n";
+    std::string msg = "\n[" + l_team->GetTeamName() + "] use SpecActions via [" + r_team->GetTeamName() + "]\n";
     std::cout << msg;
     logger_spec_acts_.Log(msg);
     for (int i = (was_killed) ? 0 : 1; i < l_team->GetSize(); ++i) {

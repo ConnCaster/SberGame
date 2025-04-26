@@ -12,6 +12,7 @@ FileLogger::FileLogger(const std::string &filename)
 void FileLogger::Log(const std::string &message) {
     if (file_.is_open()) {
         file_ << message;
+        file_.flush();
     }
 }
 
@@ -21,8 +22,8 @@ FileLogger::~FileLogger() {
     }
 }
 
-Logger::Logger(FileLogger* file_logger, LogEventType log_event_type)
-    : file_logger_{file_logger}, log_event_type_{log_event_type}
+Logger::Logger(FileLogger* file_logger)
+    : file_logger_{file_logger}
 {}
 
 

@@ -5,10 +5,6 @@
 #include <fstream>
 #include <iostream>
 
-enum class LogEventType : int {
-    LOG_DEATHS = 0,
-    LOG_SPEC_ACTS = 1
-};
 
 class ILogger {
 public:
@@ -31,7 +27,7 @@ private:
 // @brief Pattern Proxy
 class Logger : public ILogger {
 public:
-    Logger(FileLogger* file_logger, LogEventType log_event_type);
+    Logger(FileLogger* file_loggere);
     virtual ~Logger() {
         delete file_logger_;
     };
@@ -40,7 +36,6 @@ public:
 
 private:
     FileLogger* file_logger_;
-    LogEventType log_event_type_;
 };
 
 #endif //SBERGAME_LOGGER_H
