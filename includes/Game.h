@@ -51,8 +51,7 @@ private:
     ITeamBuilder* red_team_builder_;
     ITeamBuilder* blue_team_builder_;
 
-    Logger logger_death_;
-    Logger logger_spec_acts_;
+    LogMsgHandler logger_;
 
     bool red_team_order_ = true;
 

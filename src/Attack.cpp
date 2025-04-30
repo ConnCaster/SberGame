@@ -52,7 +52,7 @@ int AttackFacade::Attack(IUnit* l, IUnit* r) {
     if (r && r->GetHealth() == 0) {
         std::cout << "\tFINISH HIM!!!" << std::endl;
         std::string msg = "[" + r_team_->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " [index=" + std::to_string(r_team_->GetHeroNumber(r)) + "] was killed\n";
-        logger_->Log(msg);
+        logger_->AddLogMsg(msg, LogType::DEAD);
         delete r;
         return 1;
     } else {

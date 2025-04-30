@@ -8,7 +8,7 @@
 // @brief Pattern Facade
 class AttackFacade {
 public:
-    AttackFacade(ITeam* l_team, ITeam* r_team, ILogger* logger)
+    AttackFacade(ITeam* l_team, ITeam* r_team, LogMsgHandler* logger)
         : l_team_{l_team}, r_team_{r_team}, logger_{logger}
     {}
 
@@ -18,7 +18,7 @@ private:
     ITeam* l_team_;
     ITeam* r_team_;
 
-    ILogger* logger_;
+    LogMsgHandler* logger_;
 };
 
 #endif //SBERGAME_ATTACK_H

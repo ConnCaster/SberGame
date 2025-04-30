@@ -8,8 +8,7 @@ Game::Game()
         blue_{nullptr},
         red_team_builder_{nullptr},
         blue_team_builder_{nullptr},
-        logger_death_(new FileLogger("./logger_deaths.log")),
-        logger_spec_acts_(new FileLogger("./logger_spec_acts.log")),
+        logger_{},
         current_state_{nullptr}
 {}
 
@@ -53,21 +52,12 @@ void Game::Run() {
     ChooseFirstTurnTeam(first_team);
     red_team_order_ = (first_team == "red");
 
-    // TODO: Паттерн Observer и Bridge
-    // 1. Делаем класс, который должен
-    //      - хранить состояние системы логирования - "лог всего по умолчанию" / "лог по запросу"
-    //      - сконструировать логгеры в начале игры
-    //      - реализовать оповещение логгеров о новых сообщениях
-    // 2. Сделать метод AddLogMsg(std::string msg, int logger_type);  <-- мост
-    //      -  внутри этого метода спросить пользователя, хочет ли он логгировать событие.
-    //          Если да, то оповестить конкретный логгер в зависимости от logger_type
-    //          Если нет, никого не оповещать и проигнорировать логгирование события
-
     current_state_ = (ChooseGameMode() == GameMode::StepByStep) ? IGameState::CreateWaitingState() : nullptr;
     while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
         std::cout << "=====================================" << std::endl;
         if (current_state_) {
-            current_state_->Update(*this);   // !!!!!!!!
+            current_state_->Update(*this);
+
             std::cout << "Enter 'n': ";
             std::string input;
             std::cin >> input;
@@ -82,8 +72,8 @@ void Game::Run() {
 void Game::Turn() {
     IUnit* red_unit = red_->GetUnit();
     IUnit* blue_unit = blue_->GetUnit();
-    AttackFacade attack_facade_red{red_, blue_, &logger_death_};
-    AttackFacade attack_facade_blue{blue_, red_, &logger_death_};
+    AttackFacade attack_facade_red{red_, blue_, &logger_};
+    AttackFacade attack_facade_blue{blue_, red_, &logger_};
     if (red_team_order_) {
         // герой красных наносит удар
         int is_killed_blue = attack_facade_red.Attack(red_unit, blue_unit);
@@ -171,14 +161,14 @@ void Game::ShowGameResults() const {
 void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
     std::string msg = "\n[" + l_team->GetTeamName() + "] use SpecActions via [" + r_team->GetTeamName() + "]\n";
     std::cout << msg;
-    logger_spec_acts_.Log(msg);
+    logger_.AddLogMsg(msg, LogType::SPEC_ACT);
     for (int i = (was_killed) ? 0 : 1; i < l_team->GetSize(); ++i) {
         IUnit* unit = l_team->GetUnitByPos(i);
         // TODO: как применять специальные действия
         if (ExtractTypeFromUnitPtr(unit) == "HeavyHero") {
             msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [" + std::to_string(l_team->GetHeroNumber(unit)) + "] Does not have special ability\n";
             std::cout << msg;
-            logger_spec_acts_.Log(msg);
+            logger_.AddLogMsg(msg, LogType::SPEC_ACT);
         } else if (ExtractTypeFromUnitPtr(unit) == "Hero") {
             msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Try to append buff to neighbour HeavyHero if he exists\n";
 
@@ -196,16 +186,16 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
                 }
             }
             std::cout << msg;
-            logger_spec_acts_.Log(msg);
+            logger_.AddLogMsg(msg, LogType::SPEC_ACT);
 
         } else if (ExtractTypeFromUnitPtr(unit) == "Archer") {
             msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Does not have special ability\n";
             std::cout << msg;
-            logger_spec_acts_.Log(msg);
+            logger_.AddLogMsg(msg, LogType::SPEC_ACT);
         } else if (ExtractTypeFromUnitPtr(unit) == "Hiller") {
             msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Try to hill unit from his team\n";
             std::cout << msg;
-            logger_spec_acts_.Log(msg);
+            logger_.AddLogMsg(msg, LogType::SPEC_ACT);
             // Лечим героя из своей команды (легкого, лучника)
             unsigned int pos = l_team->GenPosAroundUnit(i, dynamic_cast<Hiller*>(unit)->GetHillDistance());
             IUnit* unit_to_hill = l_team->GetUnitByPos(pos);
@@ -213,17 +203,17 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
                 // если лечить нельзя
                 msg = "[" + ExtractTypeFromUnitPtr(unit_to_hill) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit_to_hill)) + "] Does not have ability to be hilled\n";
                 std::cout << msg;
-                logger_spec_acts_.Log(msg);
+                logger_.AddLogMsg(msg, LogType::SPEC_ACT);
             } else {
                 msg = "Hiller  [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] hills... " + ExtractTypeFromUnitPtr(unit_to_hill) + " [index=" + std::to_string(l_team->GetHeroNumber(unit_to_hill)) + "]\n";
                 std::cout << msg;
-                logger_spec_acts_.Log(msg);
+                logger_.AddLogMsg(msg, LogType::SPEC_ACT);
                 dynamic_cast<Hiller*>(unit)->PerformSpecAction(unit_to_hill);
             }
         } else if (ExtractTypeFromUnitPtr(unit) == "Wizard") {
             msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Try to clone unit from his team\n";
             std::cout << msg;
-            logger_spec_acts_.Log(msg);
+            logger_.AddLogMsg(msg, LogType::SPEC_ACT);
             // Клонирование героя из своей команды (легкого, лучника, хиллера)
             int pos = rand() % l_team->GetSize();
             IUnit* unit_to_clone = l_team->GetUnitByPos(pos);
@@ -231,11 +221,11 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
                 // если клонировать нельзя
                 msg = "[" + ExtractTypeFromUnitPtr(unit_to_clone) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit_to_clone)) + "] Does not have ability to be clonned\n";
                 std::cout << msg;
-                logger_spec_acts_.Log(msg);
+                logger_.AddLogMsg(msg, LogType::SPEC_ACT);
             } else {
                 msg = "Wizard [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] clone... " + ExtractTypeFromUnitPtr(unit_to_clone) + "\n";
                 std::cout << msg;
-                logger_spec_acts_.Log(msg);
+                logger_.AddLogMsg(msg, LogType::SPEC_ACT);
                 IUnit* cloned_unit = dynamic_cast<Wizard*>(unit)->PerformSpecAction(unit_to_clone);
                 if (cloned_unit) {
                     l_team->AddUnitToPos(cloned_unit, i++);
@@ -244,7 +234,7 @@ void Game::SpecAction(Team* l_team, Team* r_team, int was_killed) {
         } else if (ExtractTypeFromUnitPtr(unit) == "Wagenburg") {
         msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] Does not have special ability\n";
         std::cout << msg;
-        logger_spec_acts_.Log(msg);
+        logger_.AddLogMsg(msg, LogType::SPEC_ACT);
         }
     }
 }
