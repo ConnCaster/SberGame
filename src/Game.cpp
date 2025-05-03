@@ -73,8 +73,12 @@ void Game::Run() {
 void Game::Turn() {
     IUnit *red_unit = red_->GetUnit();
     IUnit *blue_unit = blue_->GetUnit();
-    AttackFacade attack_facade_red{red_, blue_, &logger_};
-    AttackFacade attack_facade_blue{blue_, red_, &logger_};
+    AttackMediator* attack_mediator_red_to_blue = new UnitToUnitAttackMediator(red_, blue_, &logger_);
+    AttackMediator* attack_mediator_blue_to_red = new UnitToUnitAttackMediator(blue_, red_, &logger_);
+
+    AttackFacade attack_facade_red{attack_mediator_red_to_blue};
+    AttackFacade attack_facade_blue{attack_mediator_blue_to_red};
+
     if (red_team_order_) {
         // герой красных наносит удар
         int is_killed_blue = attack_facade_red.Attack(red_unit, blue_unit);

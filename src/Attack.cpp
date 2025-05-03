@@ -3,7 +3,7 @@
 #include "interfaces/IUnit.h"
 #include "team/Team.h"
 
-int AttackFacade::Attack(IUnit* l, IUnit* r) {
+int UnitToUnitAttackMediator::Attack(IUnit* l, IUnit* r) {
     // сбиваем защиту HeavyHero с вероятностью 50%
     if (ExtractTypeFromUnitPtr(r) == "HeavyHero") {
         std::string buff_type = ExtractHeavyHeroTypeFromUnitPtr(dynamic_cast<HeavyHero*>(r));
