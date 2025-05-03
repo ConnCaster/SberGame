@@ -110,7 +110,7 @@ int Game::SetTeamGenerationType() {
     delete red_team_builder_;
     delete blue_team_builder_;
 
-    unsigned int type = rand() % 2+1;
+    unsigned int type = rand() % 3+1;
     std::cout << "Enter team maximum cost: ";
     unsigned int team_max_cost{0};
     std::cin >> team_max_cost;
