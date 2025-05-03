@@ -58,7 +58,7 @@ private:
     unsigned int team_cost_max_;
 };
 
-
+// @brief Pattern Bridge
 class TeamBuilderByHandChoose : public ITeamBuilder {
 public:
     TeamBuilderByHandChoose(std::shared_ptr<UnitSelectorByHands> selector, const std::string& team_name, unsigned int team_cost_max)

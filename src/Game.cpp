@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "Attack.h"
+#include "team/TeamReport.h"
 
 Game::Game()
     : red_{nullptr},
@@ -148,35 +149,18 @@ void Game::ShowGameResults() const {
     if (red_ && red_->IsEmpty()) {
         std::cout << "Blue team WIN!" << std::endl;
         std::cout << "Past units: " << blue_->GetSize() << std::endl;
-        std::cout << blue_->GetTeamInfo() << std::endl;
-        TeamIterator *iter = blue_->CreateIterator();
-        int i = 0;
-        std::cout << "=======================" << std::endl;
-        while (iter->HasNext()) {
-            IUnit *unit = iter->Next();
-            std::cout << "\t[" + std::to_string(i + 1) + "] " + ExtractTypeFromUnitPtr(unit) + " [index=" +
-                    std::to_string(blue_->GetHeroNumber(unit)) + "]\n\t\t" + unit->GetInfo() + "\n" << std::endl;
-            i++;
-        }
-        delete iter;
+
+        std::unique_ptr<ReportGenerator> team_report = std::make_unique<TeamReportGenerator>(blue_);
+        team_report->GenerateReport();
     } else if (blue_ && blue_->IsEmpty()) {
         std::cout << "Red team WIN!" << std::endl;
         std::cout << "Past units: " << red_->GetSize() << std::endl;
-        std::cout << red_->GetTeamInfo() << std::endl;
-        TeamIterator *iter = red_->CreateIterator();
-        int i = 0;
-        std::cout << "=======================" << std::endl;
-        while (iter->HasNext()) {
-            IUnit *unit = iter->Next();
-            std::cout << "\t[" + std::to_string(i + 1) + "] " + ExtractTypeFromUnitPtr(unit) + " [index=" +
-                    std::to_string(red_->GetHeroNumber(unit)) + "]\n\t\t" + unit->GetInfo() << std::endl;
-            i++;
-        }
-        delete iter;
+
+        std::unique_ptr<ReportGenerator> team_report = std::make_unique<TeamReportGenerator>(red_);
+        team_report->GenerateReport();
     }
 }
 
-// "[index=" << l_team_->GetHeroNumber(l) << "]"
 void Game::SpecAction(Team *l_team, Team *r_team, int was_killed) {
     std::string msg = "\n[" + l_team->GetTeamName() + "] use SpecActions via [" + r_team->GetTeamName() + "]\n";
     std::cout << msg;

@@ -40,6 +40,8 @@ public:
     std::string GetTeamName() const { return team_name_; }
     unsigned int GetHeroNumber(IUnit* unit) const;
 
+    std::deque<IUnit*> GetTeam() { return units_; }
+
     std::vector<std::pair<IUnit*, unsigned int>> CheckIfHeavyHeroNeighbour(unsigned int pos) const;
 
 private:

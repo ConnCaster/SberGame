@@ -33,6 +33,7 @@ set(CMAKE_CXX_STANDARD 20)
 #
 #        includes/team/TeamIterator.h
 #        includes/team/UnitNumberManager.h
+#        includes/team/TeamReport.h
 #)
 
 list(APPEND ${PROJECT_NAME}_SOURCES
@@ -59,9 +60,8 @@ list(APPEND ${PROJECT_NAME}_SOURCES
         src/team/Team.cpp
         src/team/TeamBuilder.cpp
         src/team/UnitNumberManager.cpp
+        src/team/TeamReport.cpp
         )
 
-add_executable(SberGame ${${PROJECT_NAME}_SOURCES}
-
-)
+add_executable(SberGame ${${PROJECT_NAME}_SOURCES})
 target_include_directories(SberGame PUBLIC includes)
