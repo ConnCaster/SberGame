@@ -37,7 +37,9 @@ public:
 
 private:
     int SetTeamGenerationType();
+    unsigned int ChooseTeamBuilderType();
     Team* CreateTeam(ITeamBuilder* team_builder);
+
 
     void SpecAction(Team* l_team, Team* r_team, int was_killed);
 

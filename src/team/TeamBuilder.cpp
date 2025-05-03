@@ -74,7 +74,7 @@ IUnit* UnitSelectorByHands::SelectHero() {
             std::cout << "Unit is choose correctly" << std::endl;
             return UnitFactory::CreateUnit(hero_name);
         } else {
-            std::cout << "Unknown unit name. Choose another one [Hero=50/HeavyHero=60/Archer=30/Hiller=10/Wizard=20/Wagenburg=40]: ";
+            std::cout << "Unknown unit name. Choose again [Hero=50/HeavyHero=60/Archer=30/Hiller=10/Wizard=20/Wagenburg=40]: ";
         }
     }
 }

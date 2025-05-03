@@ -95,26 +95,25 @@ private:
 class ITeamBuilderFactory {
 public:
     static ITeamBuilder* CreateTeamBuilder(unsigned int type, const std::string team_name, unsigned int team_max_cost) {
-        // switch (type) {
-        //     case 1: {
-        //         return new TeamBuilderRandom{team_name, team_max_cost};
-        //     }
-        //     case 2: {
-        //         return new TeamBuilderGreedy{team_name, team_max_cost};
-        //     }
-        //     case 3: {
-        //         std::shared_ptr<HeroSelector> selector_impl = std::make_shared<HeroSelector>(UserHeroSelector());
-        //         return new TeamBuilderByHandChoose{selector_impl, team_name, team_max_cost};
-        //     }
-        //     default:{
-        //         return nullptr;
-        //     }
-        // }
+        switch (type) {
+            case 1: {
+                return new TeamBuilderRandom{team_name, team_max_cost};
+            }
+            case 2: {
+                return new TeamBuilderGreedy{team_name, team_max_cost};
+            }
+            case 3: {
+                std::shared_ptr<UnitSelectorByHands> selector_impl = std::make_shared<UnitSelectorByHands>(UnitSelectorByHands());
+                return new TeamBuilderByHandChoose{selector_impl, team_name, team_max_cost};
+            }
+            default:{
+                return nullptr;
+            }
+        }
         // return new TeamBuilderGreedy{team_name, team_max_cost};
         // return new TeamBuilderRandom{team_name, team_max_cost};
-        std::shared_ptr<UnitSelectorByHands> selector_impl = std::make_shared<UnitSelectorByHands>(UnitSelectorByHands());
-        return new TeamBuilderByHandChoose{selector_impl, team_name, team_max_cost};
-
+        // std::shared_ptr<UnitSelectorByHands> selector_impl = std::make_shared<UnitSelectorByHands>(UnitSelectorByHands());
+        // return new TeamBuilderByHandChoose{selector_impl, team_name, team_max_cost};
     }
 };
 
