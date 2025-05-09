@@ -4,6 +4,7 @@
 #include "team/Team.h"
 
 int UnitToUnitAttackMediator::Attack(IUnit* l, IUnit* r) {
+    bool was_smbd_killed = false;
     // сбиваем защиту HeavyHero с вероятностью 50%
     if (ExtractTypeFromUnitPtr(r) == "HeavyHero") {
         std::string buff_type = ExtractHeavyHeroTypeFromUnitPtr(dynamic_cast<HeavyHero*>(r));
@@ -54,11 +55,16 @@ int UnitToUnitAttackMediator::Attack(IUnit* l, IUnit* r) {
         std::string msg = "[" + r_team_->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " [index=" + std::to_string(r_team_->GetHeroNumber(r)) + "] was killed\n";
         logger_->AddLogMsg(msg, LogType::DEAD);
         delete r;
-        return 1;
+        was_smbd_killed = true;
+        // return 1;
     } else {
         if (r) {
             r_team_->ReturnUnit(r);
         }
+    }
+    if (was_smbd_killed) {
+        logger_->ExecLog(LogType::DEAD);
+        return 1;
     }
     return 0;
 }

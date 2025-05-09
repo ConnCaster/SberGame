@@ -173,7 +173,7 @@ void Game::SpecAction(Team *l_team, Team *r_team, int was_killed) {
         IUnit *unit = l_team->GetUnitByPos(i);
         // TODO: как применять специальные действия
         if (ExtractTypeFromUnitPtr(unit) == "HeavyHero") {
-            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [" + std::to_string(l_team->GetHeroNumber(unit)) +
+            msg = "[" + ExtractTypeFromUnitPtr(unit) + "] [index=" + std::to_string(l_team->GetHeroNumber(unit)) +
                   "] Does not have special ability\n";
             std::cout << msg;
             logger_.AddLogMsg(msg, LogType::SPEC_ACT);
@@ -256,6 +256,7 @@ void Game::SpecAction(Team *l_team, Team *r_team, int was_killed) {
             logger_.AddLogMsg(msg, LogType::SPEC_ACT);
         }
     }
+    logger_.ExecLog(LogType::SPEC_ACT);
 }
 
 // @brief Pattern Fabric Method

@@ -1,5 +1,7 @@
 #include "logger/Logger.h"
 
+// int LogMessage::dead_idx = 0;
+// int LogMessage::spec_act_idx = 0;
 
 FileLogger::FileLogger(const std::string &filename)
         : filename_(filename) {
@@ -9,9 +11,9 @@ FileLogger::FileLogger(const std::string &filename)
     }
 }
 
-void FileLogger::Log(LogMessage *log_msg) {
+void FileLogger::Log(LogMessage *log_msg, LogType type) {
     if (file_.is_open()) {
-        file_ << log_msg->GetLogMsg();
+        file_ << log_msg->GetLogMsg(type);
         file_.flush();
     }
 }
@@ -36,19 +38,9 @@ LogMsgHandler::LogMsgHandler()
 }
 
 void LogMsgHandler::AddLogMsg(const std::string& msg, LogType log_type) {
-    if (log_mode_ == LogMode::LOG_ALL) {
         log_msg_.SetLogMessage(msg, log_type);
-    } else if (log_mode_ == LogMode::LOG_BY_REQ) {
-        std::cout << "Do you want to save log message [yes/no]: ";
-        std::string is_need_log;
-        do {
-            std::cin >> is_need_log;
-            if (is_need_log != "yes" && is_need_log != "no") {
-                std::cout << "Unknown enter. Choose again [yes/no]: " ;
-            }
-        } while (is_need_log != "yes" && is_need_log != "no");
-        if (is_need_log == "yes") {
-            log_msg_.SetLogMessage(msg, log_type);
-        }
-    }
+}
+
+void LogMsgHandler::ExecLog(LogType log_type) {
+    log_msg_.ExecLog(log_type, log_mode_);
 }

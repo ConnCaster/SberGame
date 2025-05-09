@@ -20,7 +20,7 @@ class LogMessage;
 
 class ILogger {
 public:
-    virtual void Log(LogMessage* log_msg) {};
+    virtual void Log(LogMessage* log_msg, LogType log_type) {};
     virtual ~ILogger() = default;
 };
 
@@ -28,26 +28,111 @@ public:
 class LogMessage {
 public:
     void Attach(LogType log_type, ILogger* logger) {
-        observed_loggers[log_type] = logger;
+        observed_loggers_[log_type] = logger;
+        log_messages_[log_type] = {};
+        log_idxs_[log_type] = 0;
     }
 
     void SetLogMessage(const std::string& log_msg, LogType log_type) {
-        log_msg_ = log_msg;
-        NotifyLoggers(log_type);
+        log_messages_[log_type].push_back(log_msg);
+        // log_msg_ = log_msg;
+        // NotifyLoggers(log_type);
     }
 
-    std::string GetLogMsg() const {
-        return log_msg_;
+    void ExecLog(LogType log_type, LogMode log_mode) {
+        if (log_mode == LogMode::LOG_ALL) {
+            NotifyLoggers(log_type, log_mode);
+        } else {
+            if (log_type == LogType::DEAD) {
+                std::cout << "Do you want to save DEAD log messages [yes/no]: ";
+                std::string is_need_log;
+                do {
+                    std::cin >> is_need_log;
+                    if (is_need_log != "yes" && is_need_log != "no") {
+                        std::cout << "Unknown enter. Choose again [yes/no]: " ;
+                    }
+                } while (is_need_log != "yes" && is_need_log != "no");
+                if (is_need_log == "yes") {
+                    NotifyLoggers(log_type, log_mode);
+                } else {
+                    log_idxs_[log_type] = 0;
+                    log_messages_[log_type].clear();
+                }
+            } else if (log_type == LogType::SPEC_ACT) {
+                std::cout << "Do you want to save SPEC_ACT log messages [yes/no]: ";
+                std::string is_need_log;
+                do {
+                    std::cin >> is_need_log;
+                    if (is_need_log != "yes" && is_need_log != "no") {
+                        std::cout << "Unknown enter. Choose again [yes/no]: " ;
+                    }
+                } while (is_need_log != "yes" && is_need_log != "no");
+                if (is_need_log == "yes") {
+                    NotifyLoggers(log_type, log_mode);
+                } else {
+                    log_idxs_[log_type] = 0;
+                    log_messages_[log_type].clear();
+                }
+            }
+        }
+    }
+
+    std::string GetLogMsg(LogType log_type) {
+        try {
+            return log_messages_[log_type].at(log_idxs_[log_type]);
+        } catch (...) {
+            std::cout << "[ERROR] There is no log msg with idx" << std::endl;
+            return "";
+        }
     }
 
 private:
-    void NotifyLoggers(LogType log_type) {
-        observed_loggers[log_type]->Log(this);
+    void NotifyLoggers(LogType log_type, LogMode log_mode) {
+        if (log_mode != LogMode::LOG_ALL) {
+            if (log_type == LogType::SPEC_ACT) {
+                std::cout << "Do you want to save all messages in the turn (if no, every msg will be approved)[yes/no]: ";
+                std::string is_need_log;
+                do {
+                    std::cin >> is_need_log;
+                    if (is_need_log != "yes" && is_need_log != "no") {
+                        std::cout << "Unknown enter. Choose again [yes/no]: " ;
+                    }
+                } while (is_need_log != "yes" && is_need_log != "no");
+                if (is_need_log == "no") {
+                    for (std::string& msg : log_messages_[log_type]) {
+                        std::cout << msg << std::endl;
+                        std::cout << "Do you want to save log message [yes/no]: ";
+                        do {
+                            std::cin >> is_need_log;
+                            if (is_need_log != "yes" && is_need_log != "no") {
+                                std::cout << "Unknown enter. Choose again [yes/no]: " ;
+                            }
+                        } while (is_need_log != "yes" && is_need_log != "no");
+                        if (is_need_log == "no") {
+                            log_idxs_[log_type]++;
+                            continue;
+                        }
+                        observed_loggers_[log_type]->Log(this, log_type);
+                        log_idxs_[log_type]++;
+                    }
+                    log_idxs_[log_type] = 0;
+                    log_messages_[log_type].clear();
+                    return;
+                }
+            }
+        }
+        for (std::string& msg : log_messages_[log_type]) {
+            observed_loggers_[log_type]->Log(this, log_type);
+            log_idxs_[log_type]++;
+        }
+        log_idxs_[log_type] = 0;
+        log_messages_[log_type].clear();
     }
 
 private:
-    std::unordered_map<LogType, ILogger*> observed_loggers;
-    std::string log_msg_;
+    std::unordered_map<LogType, ILogger*> observed_loggers_;
+    std::unordered_map<LogType, std::vector<std::string>> log_messages_;
+    std::unordered_map<LogType, int> log_idxs_;
 };
 
 class FileLogger : public ILogger {
@@ -60,7 +145,7 @@ public:
         }
     }
 
-    void Log(LogMessage* log_msg) override;
+    void Log(LogMessage* log_msg, LogType log_type) override;
 
 private:
     std::string filename_;
@@ -78,8 +163,8 @@ public:
         delete file_logger_;
     };
 
-    void Log(LogMessage* log_msg) override {
-        file_logger_->Log(log_msg);
+    void Log(LogMessage* log_msg, LogType log_type) override {
+        file_logger_->Log(log_msg, log_type);
     }
 
 private:
@@ -92,7 +177,7 @@ public:
     LogMsgHandler();
 
     void AddLogMsg(const std::string& msg, LogType log_type);
-
+    void ExecLog(LogType log_type);
 private:
     LogMessage log_msg_;
     LogMode log_mode_;
