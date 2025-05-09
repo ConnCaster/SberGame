@@ -218,7 +218,7 @@ void Game::SpecAction(Team *l_team, Team *r_team, int was_killed) {
                 std::cout << msg;
                 logger_.AddLogMsg(msg, LogType::SPEC_ACT);
             } else {
-                msg = "Hiller  [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] hills... " +
+                msg = "[Hiller] [index=" + std::to_string(l_team->GetHeroNumber(unit)) + "] hills... " +
                       ExtractTypeFromUnitPtr(unit_to_hill) + " [index=" + std::to_string(
                           l_team->GetHeroNumber(unit_to_hill)) + "]\n";
                 std::cout << msg;

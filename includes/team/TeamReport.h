@@ -34,8 +34,8 @@ public:
         int i = 0;
         while (iter->HasNext()) {
             IUnit *unit = iter->Next();
-            std::cout << "\t[" + std::to_string(i + 1) + "] " + ExtractTypeFromUnitPtr(unit) + " [index=" +
-                    std::to_string(team_->GetHeroNumber(unit)) + "]\n\t\t" + unit->GetInfo() << std::endl;
+            formatted_report_ += "\t[" + std::to_string(i + 1) + "] " + ExtractTypeFromUnitPtr(unit) + " [index=" +
+                    std::to_string(team_->GetHeroNumber(unit)) + "]\n\t\t" + unit->GetInfo() + "\n";
             i++;
         }
     }
