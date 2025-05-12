@@ -2,7 +2,7 @@
 #define COMMAND_H
 
 
-// Базовый класс команды
+// @brief Pattern Command
 class ICommand {
 public:
     virtual ~ICommand() = default;
@@ -18,11 +18,11 @@ public:
 
     void ExecuteCommand(ICommand* command) {
         command->Execute();
-        commands_.push(command);
+        commands_.push_back(command);
 
         // Ограничиваем историю команд 3 последними ходами
         if (commands_.size() > 3) {
-            commands_.pop();
+            commands_.pop_front();
         }
     }
 
@@ -31,14 +31,14 @@ public:
             return false;
         }
 
-        auto& lastCommand = commands_.top();
+        auto& lastCommand = commands_.back();
         lastCommand->Undo();
-        commands_.pop();
+        commands_.pop_back();
         return true;
     }
 
 private:
-    std::stack<ICommand*> commands_;
+    std::deque<ICommand*> commands_;
 };
 
 #endif //COMMAND_H

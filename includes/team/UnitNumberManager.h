@@ -8,6 +8,7 @@
 
 class IUnitNumberManager {
 public:
+    virtual IUnitNumberManager* DeepCopy() = 0;
     virtual void ReplaceHero(IUnit* prev_hero, IUnit* new_hero) = 0;
     virtual bool HasNumber(IUnit* hero) const = 0;
     virtual unsigned int GetNumber(IUnit* hero) const = 0;
@@ -16,6 +17,18 @@ public:
 
 class UnitNumberManager : public IUnitNumberManager {
 public:
+    UnitNumberManager() = default;
+
+    // UnitNumberManager(const UnitNumberManager& other)
+    //     : IUnitNumberManager(),
+    //         hero_numbers_(other.hero_numbers_),
+    //         next_number_(other.next_number_)
+    // {}
+
+    UnitNumberManager* DeepCopy() {
+        return new UnitNumberManager(*this);
+    }
+
     unsigned int AssignNumber(IUnit* hero);
     unsigned int GetNumber(IUnit* hero) const;
 

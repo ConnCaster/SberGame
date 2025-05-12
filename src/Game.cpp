@@ -59,7 +59,7 @@ void Game::Run() {
         if (current_state_) {
             current_state_->Update(*this);
 
-            std::cout << "Enter 'n': ";
+            std::cout << "Enter 'n' (next turn) or 'u' (undo turn): ";
             std::string input;
             std::cin >> input;
             if (input == "u") {
