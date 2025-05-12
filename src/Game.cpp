@@ -62,7 +62,13 @@ void Game::Run() {
             std::cout << "Enter 'n': ";
             std::string input;
             std::cin >> input;
-            current_state_->HandleInput(*this, input);
+            if (input == "u") {
+                if (!UndoLastTurn()) {
+                    std::cout << "Nothing to undo!" << std::endl;
+                }
+            } else {
+                current_state_->HandleInput(*this, input);
+            }
         } else {
             ProcessTurnLogic();
         }
@@ -287,18 +293,24 @@ void WaitingForInputState::Update(Game &game) {
 void WaitingForInputState::HandleInput(Game &game, std::string &input) {
     if (input == "n") {
         game.SetState(IGameState::CreateProcessingState());
+    } else if (input == "u") {
+        if (!game.UndoLastTurn()) {
+            std::cout << "Nothing to undo!" << std::endl;
+        }
+        std::cout << "Enter 'n' for next turn or 'u' to undo last turn (max 3): ";
+        std::cin >> input;
+        HandleInput(game, input);
     } else {
         std::cout << "Error. Enter 'n' again: ";
         std::cin >> input;
         HandleInput(game, input);
-        // game.HandleInput(input);
     }
 }
 
 // Обработка состояния хода
 void ProcessingTurnState::Update(Game &game) {
     game.ProcessTurnLogic();
-    game.SetState(IGameState::CreateWaitingState());
+    game.SetState(CreateWaitingState());
 }
 
 void ProcessingTurnState::HandleInput(Game &game, std::string &input) {

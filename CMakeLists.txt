@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 #        includes/Team.h
 #        includes/UnitFactory.h
 #        includes/Attack.h
+#        includes/Command.h
 #
 #        includes/logger/logger.h
 #
