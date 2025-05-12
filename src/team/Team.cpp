@@ -11,14 +11,16 @@ Team::~Team() {
     // }
 }
 
-Team::Team(const Team &other) {
-    std::cout << "TEAM COPY CTOR" << std::endl;
-    *this = other;
-    // team_name_ = other.team_name_;
-    // for (auto& elem : other.units_) {
-    //     units_.push_back(new elem);
-    // }
-    // number_manager_ = new IUnitNumberManager{other.number_manager_};
+Team::Team(const Team& other)
+    : team_name_(other.team_name_),
+        number_manager_(new UnitNumberManager)
+{
+    for (const auto& unit : other.units_) {
+        // int hero_idx = other.number_manager_->GetNumber(unit);
+        IUnit* new_unit = unit->DeepCopy();
+        units_.push_back(new_unit);
+        number_manager_->AssignNumber(new_unit);
+    }
 }
 
 

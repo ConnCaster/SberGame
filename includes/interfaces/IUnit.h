@@ -10,7 +10,7 @@ public:
         : health_{health}, protection_{protection}, damage_{damage}
     {}
 
-    // virtual IUnit* DeepCopy(IUnit* other){};
+    virtual IUnit* DeepCopy() = 0;
 
     // методы, доступные всем юнитам ...
     virtual void DecreaseHealth(unsigned int damage) = 0;

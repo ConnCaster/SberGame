@@ -15,6 +15,10 @@ public:
 
     Archer(const Archer& other);
 
+    IUnit* DeepCopy() {
+        return new Archer(*this);
+    }
+
     IUnit* Clone() override;
     void Hill(unsigned int additional_health) override;
 

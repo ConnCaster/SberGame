@@ -7,6 +7,12 @@ public:
     Wagenburg();
     ~Wagenburg() = default;
 
+    Wagenburg(const Wagenburg& other)
+       : health_(other.health_),
+         protection_(other.protection_),
+         damage_(other.damage_)
+    {}
+
     void GetShoot(unsigned int damage);
 
     unsigned int GetHealth() const { return health_; }
@@ -23,6 +29,14 @@ public:
     WagenburgAdapter(Wagenburg* wagenburg)
         : IUnit(wagenburg->GetHealth(), 0, 0), wagenburg_(wagenburg)
     {}
+
+    WagenburgAdapter(const WagenburgAdapter& other)
+        : IUnit(other), wagenburg_(new Wagenburg(*other.wagenburg_))
+    {}
+
+    IUnit* DeepCopy() {
+        return new WagenburgAdapter(*this);
+    }
 
     ~WagenburgAdapter() {
         delete wagenburg_;

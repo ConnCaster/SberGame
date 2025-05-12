@@ -15,6 +15,10 @@ public:
 
     Hero(const Hero& other);
 
+    IUnit* DeepCopy() {
+        return new Hero(*this);
+    }
+
     IUnit* Clone() override;
     void Hill(unsigned int additional_health) override;
 

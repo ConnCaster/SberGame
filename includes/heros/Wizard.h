@@ -5,11 +5,20 @@
 
 #include "interfaces/ISpecAction.h"
 #include "interfaces/IUnit.h"
+#include "spec_actions/CloneSpecAction.h"
 
 class Wizard : public IUnit {
 public:
     Wizard();
     ~Wizard() override = default;
+
+    Wizard(const Wizard& other)
+        : IUnit(other.health_, other.protection_, other.damage_), distance_(other.distance_), spec_action_{std::make_unique<CloneSpecAction>()}
+    {}
+
+    IUnit* DeepCopy() {
+        return new Wizard(*this);
+    }
 
     void DecreaseHealth(unsigned int damage) override;
 

@@ -4,6 +4,7 @@
 #include <memory>
 #include <iostream>
 
+#include "attacks/NormalAttack.h"
 #include "interfaces/IAttack.h"
 #include "interfaces/IUnit.h"
 
@@ -11,6 +12,15 @@ class HeavyHero : public IUnit {
 public:
     HeavyHero();
     virtual ~HeavyHero() override = default;
+
+    HeavyHero(const HeavyHero& other)
+        : IUnit(other),  // копируем базовый IUnit
+          attack_(std::make_unique<NormalAttack>())
+    {}
+
+    IUnit* DeepCopy() {
+        return new HeavyHero(*this);
+    }
 
     void DecreaseHealth(unsigned int damage) override;
 
@@ -39,6 +49,18 @@ protected:
 public:
     HeavyHeroDecorator(HeavyHero* hero, const std::string &buff_name, int attack, int defense)
         : inner_heavy_hero_(hero), buff_name_(buff_name), attack_bonus_(attack), defense_bonus_(defense) {
+    }
+
+    HeavyHeroDecorator(const HeavyHeroDecorator& other)
+            : HeavyHero(other),
+              buff_name_(other.buff_name_),
+              attack_bonus_(other.attack_bonus_),
+              defense_bonus_(other.defense_bonus_),
+              inner_heavy_hero_(other.inner_heavy_hero_ ? dynamic_cast<HeavyHero *>(other.inner_heavy_hero_->DeepCopy()) : nullptr)  // рекурсивное копирование
+        {}
+
+    IUnit* DeepCopy() {
+        return new HeavyHeroDecorator(*this);
     }
 
     virtual ~HeavyHeroDecorator() = default;
@@ -96,6 +118,14 @@ public:
     HorseDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Horse", 0, 5) {}
 
+    HorseDecorator(const HorseDecorator& other)
+        : HeavyHeroDecorator(other)  // делегируем базовому HeavyHeroDecorator
+    {}
+
+    IUnit* DeepCopy() {
+        return new HorseDecorator(*this);
+    }
+
     virtual ~HorseDecorator() = default;
 };
 
@@ -103,6 +133,14 @@ class SpearDecorator : public HeavyHeroDecorator {
 public:
     SpearDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Spear", 10, 0) {}
+
+    SpearDecorator(const HorseDecorator& other)
+            : HeavyHeroDecorator(other)  // делегируем базовому HeavyHeroDecorator
+        {}
+
+    IUnit* DeepCopy() {
+        return new SpearDecorator(*this);
+    }
 
     void PerformAttack(IUnit *target) {
         std::cout << "[HeavyHero] Attack buff " << buff_name_ << std::endl;
@@ -121,6 +159,14 @@ public:
     ShieldDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Shield", 0, 8) {}
 
+    ShieldDecorator(const HorseDecorator& other)
+                : HeavyHeroDecorator(other)  // делегируем базовому HeavyHeroDecorator
+            {}
+
+    IUnit* DeepCopy() {
+        return new ShieldDecorator(*this);
+    }
+
     virtual ~ShieldDecorator() = default;
 };
 
@@ -128,6 +174,14 @@ class HelmetDecorator : public HeavyHeroDecorator {
 public:
     HelmetDecorator(HeavyHero* hero)
         : HeavyHeroDecorator(hero, "Helmet", 0, 3) {}
+
+    HelmetDecorator(const HorseDecorator& other)
+                : HeavyHeroDecorator(other)  // делегируем базовому HeavyHeroDecorator
+            {}
+
+    IUnit* DeepCopy() {
+        return new HelmetDecorator(*this);
+    }
 
     virtual ~HelmetDecorator() = default;
 };

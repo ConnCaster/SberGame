@@ -15,6 +15,10 @@ public:
 
     Hiller(const Hiller& other);
 
+    IUnit* DeepCopy() {
+        return new Hiller(*this);
+    }
+
     IUnit* Clone() override;
 
     void DecreaseHealth(unsigned int damage) override;
