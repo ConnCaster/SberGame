@@ -49,6 +49,11 @@ void Game::Run() {
     red_ = CreateTeam(red_team_builder_);
     blue_ = CreateTeam(blue_team_builder_);
 
+    if (!red_ || !blue_) {
+        std::cout << "Error while creating team. Abort..." << std::endl;
+        return;
+    }
+
     std::string first_team{};
     ChooseFirstTurnTeam(first_team);
     red_team_order_ = (first_team == "red");
@@ -119,7 +124,7 @@ void Game::Turn() {
 unsigned int Game::ChooseTeamBuilderType() {
     std::string team_builder_type{};
 
-    std::cout << "Enter team builder type [Random/Greedy/ByHands]: ";
+    std::cout << "Enter team builder type [Random/Greedy/ByHands/AllHeros]: ";
     while (true) {
         std::cin >> team_builder_type;
         if (team_builder_type == "Random") {
@@ -128,6 +133,8 @@ unsigned int Game::ChooseTeamBuilderType() {
             return 2;
         } else if (team_builder_type == "ByHands") {
             return 3;
+        } else if (team_builder_type == "AllHeros") {
+            return 4;
         } else {
             std::cout << "Unknown team builder type. Choose again [Random/Greedy/ByHands]: ";
         }

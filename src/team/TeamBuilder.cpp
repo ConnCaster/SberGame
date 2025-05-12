@@ -109,3 +109,40 @@ Team* TeamBuilderByHandChoose::GetTeam() {
                  "Cost: " + std::to_string(team_cost_) << std::endl;
     return team_;
 }
+
+void TeamBuilderAllUnits::GenerateTeam() {
+    auto it = kHeroCosts.begin();
+    while (team_cost_ <= (team_cost_max_ - kMinUnitCost) && it != kHeroCosts.end()) {
+        unsigned int unit_cost = it->second;
+        if (team_cost_ + unit_cost > team_cost_max_) {
+            std::cout << "All units mode is more expensive then max team cost. Abort..." << std::endl;
+            return;
+        }
+        IUnit* unit = UnitFactory::CreateUnit(it->first);
+        team_->AddUnit(unit);
+        team_cost_ += unit_cost;
+        it++;
+    }
+    if (it == kHeroCosts.end()) {
+        all_units_flag = true;
+    }
+
+    while (team_cost_ <= (team_cost_max_ - kMinUnitCost)) {
+        int random_unit_idx = std::rand() % kHeroCosts.size();
+        auto it = kHeroCosts.begin();
+        std::advance(it, random_unit_idx);
+        unsigned int unit_cost = it->second;
+        if (team_cost_ + unit_cost > team_cost_max_) {
+            continue;
+        }
+        IUnit* unit = UnitFactory::CreateUnit(it->first);
+        team_->AddUnit(unit);
+        team_cost_ += unit_cost;
+    }
+}
+
+Team* TeamBuilderAllUnits::GetTeam() {
+    std::cout << team_->GetTeamInfo() <<
+                 "Cost: " + std::to_string(team_cost_) << std::endl;
+    return (all_units_flag) ? team_ : nullptr;
+}
