@@ -18,7 +18,9 @@ class IUnitNumberManager;
 class Team : public ITeam {
 public:
     Team(const std::string& team_name);
-    ~Team();
+    ~Team() override;
+
+    Team(const Team& other);
 
     TeamIterator* CreateIterator();
 

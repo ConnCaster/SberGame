@@ -5,10 +5,22 @@ Team::Team(const std::string& team_name)
 {}
 
 Team::~Team() {
-    for (auto unit: units_) {
-        delete unit;
-    }
+    // TODO: раскомментировать
+    // for (auto unit: units_) {
+    //     delete unit;
+    // }
 }
+
+Team::Team(const Team &other) {
+    std::cout << "TEAM COPY CTOR" << std::endl;
+    *this = other;
+    // team_name_ = other.team_name_;
+    // for (auto& elem : other.units_) {
+    //     units_.push_back(new elem);
+    // }
+    // number_manager_ = new IUnitNumberManager{other.number_manager_};
+}
+
 
 TeamIterator* Team::CreateIterator() {
     return new TeamIterator(this);
