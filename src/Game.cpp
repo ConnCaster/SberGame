@@ -47,9 +47,12 @@ void Game::Run() {
     SetTeamGenerationType();
     std::cout << "\n==== Start game ====\n";
     red_ = CreateTeam(red_team_builder_);
+    if (!red_) {
+        std::cout << "Error while creating team. Abort..." << std::endl;
+        return;
+    }
     blue_ = CreateTeam(blue_team_builder_);
-
-    if (!red_ || !blue_) {
+    if (!blue_) {
         std::cout << "Error while creating team. Abort..." << std::endl;
         return;
     }
@@ -124,7 +127,7 @@ void Game::Turn() {
 unsigned int Game::ChooseTeamBuilderType() {
     std::string team_builder_type{};
 
-    std::cout << "Enter team builder type [Random/Greedy/ByHands/AllHeros]: ";
+    std::cout << "Enter team builder type [Random/Greedy/ByHands/AllHeros/FromFile]: ";
     while (true) {
         std::cin >> team_builder_type;
         if (team_builder_type == "Random") {
@@ -135,6 +138,8 @@ unsigned int Game::ChooseTeamBuilderType() {
             return 3;
         } else if (team_builder_type == "AllHeros") {
             return 4;
+        } else if (team_builder_type == "FromFile") {
+            return 5;
         } else {
             std::cout << "Unknown team builder type. Choose again [Random/Greedy/ByHands]: ";
         }

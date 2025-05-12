@@ -76,6 +76,24 @@ private:
     bool all_units_flag = false;
 };
 
+class TeamBuilderFromFile : public ITeamBuilder {
+public:
+    TeamBuilderFromFile(const std::string& team_name, unsigned int team_cost_max)
+            : selector_impl_{}, team_{new Team{team_name}}, team_cost_{0}, team_cost_max_{team_cost_max}
+    {}
+    ~TeamBuilderFromFile() override = default;
+
+    void GenerateTeam() override;
+    Team* GetTeam() override;
+
+private:
+    std::shared_ptr<UnitSelector> selector_impl_;
+    Team* team_;
+    unsigned int team_cost_;
+    unsigned int team_cost_max_;
+    bool enough_money = true;
+};
+
 // @brief Pattern Bridge
 class TeamBuilderByHandChoose : public ITeamBuilder {
 public:
@@ -126,6 +144,9 @@ public:
             }
             case 4: {
                 return new TeamBuilderAllUnits{team_name, team_max_cost};
+            }
+            case 5: {
+                return new TeamBuilderFromFile{team_name, team_max_cost};
             }
             default:{
                 return nullptr;
