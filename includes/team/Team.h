@@ -10,12 +10,6 @@
 #include "team/TeamIterator.h"
 #include "team/UnitNumberManager.h"
 
-enum class FormationType {
-    LINE_FIRST_ONLY,    // Линия, атакует только первый
-    LINE_ALL_ATTACK,    // Линия, атакуют все
-    COLUMN_OF_THREE     // Колонна по три
-};
-
 std::string ExtractTypeFromUnitPtr(IUnit* unit);
 
 class IUnitNumberManager;
@@ -32,10 +26,14 @@ public:
 
     // работа с командой юнитов: получение и возрат юнитов во время боя
     IUnit* GetUnit();  // удаляет игрока из команды
+    // IUnit* Team::GetUnitByPosAndRemove(); // удаляет из команды
     IUnit* GetRandomUnit(unsigned int distance = 0); // удаляет игрока из команды
     IUnit* GetUnitByPos(unsigned int pos);  // не удаляет игрока из команды
     void ReturnUnit(IUnit* unit);
+    void ReturnUnitToPos(IUnit *unit, unsigned int pos);
     void ReplaceUnit(IUnit* unit, unsigned int pos);
+
+    void RemoveUnit(IUnit *unit);
 
     void AddUnit(IUnit* unit);
     void AddUnitToPos(IUnit* unit, unsigned int pos);
@@ -62,6 +60,10 @@ public:
         return formation_;
     }
 
+    void ReSetCurrUnitInRow() override {
+        current_unit_in_row_ = 0;
+    }
+
 // Метод для получения следующего атакующего юнита
     IUnit* GetNextAttacker() {
         if (units_.empty()) return nullptr;
@@ -71,9 +73,8 @@ public:
                 return GetUnit();
 
             case FormationType::LINE_ALL_ATTACK: {
-                static size_t current = 0;
                 for (size_t i = 0; i < units_.size(); ++i) {
-                    current = (current + 1) % units_.size();
+                    int current = (current_unit_in_row_++) % units_.size();
                     if (units_[current]->IsAlive()) {
                         return units_[current];
                     }

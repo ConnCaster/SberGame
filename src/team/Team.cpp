@@ -40,7 +40,19 @@ IUnit* Team::GetUnit() {
 }
 
 void Team::ReturnUnit(IUnit *unit) {
+    for (auto cur_unit : units_) {
+        if (cur_unit == unit) return;
+    }
     units_.push_front(unit);
+}
+
+void Team::ReturnUnitToPos(IUnit *unit, unsigned int pos) {
+    if (pos < 0 || pos >= GetSize()) return;
+    for (auto cur_unit : units_) {
+        if (cur_unit == unit) return;
+    }
+    auto it_to_pos = units_.begin() + pos;
+    units_.insert(it_to_pos, unit);
 }
 
 void Team::ReplaceUnit(IUnit *unit, unsigned int pos) {
@@ -51,6 +63,16 @@ void Team::ReplaceUnit(IUnit *unit, unsigned int pos) {
     }
     number_manager_->ReplaceHero(tmp_unit, unit);
     units_.at(pos) = unit;
+}
+
+void Team::RemoveUnit(IUnit *unit) {
+    for (int i = 0; i < GetSize(); i++) {
+        if (units_[i] == unit) {
+            units_.erase(units_.begin() + i);
+            number_manager_->RemoveHero(unit);
+            return;
+        }
+    }
 }
 
 void Team::AddUnit(IUnit* unit) {

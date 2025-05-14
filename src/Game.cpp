@@ -117,44 +117,88 @@ void Game::Turn() {
 
     if (red_team_order_) {
         // герой красных наносит удар
-        IUnit* red_attacker = red_->GetNextAttacker();
-        if (red_attacker) {
-            IUnit* blue_target = blue_->GetUnit();
-            int is_killed_blue = attack_facade_red.Attack(red_attacker, blue_target);
-            int is_killed_red{0};
-            if (!is_killed_blue && blue_target->IsAlive()) {
-                // Контратака синей команды
-                IUnit* blue_attacker = blue_->GetNextAttacker();
-                if (blue_attacker) {
-                    IUnit* red_target = red_->GetUnit();
-                    attack_facade_blue.Attack(blue_attacker, red_target);
+        int is_killed_blue = 0;
+        if (red_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
+            IUnit* red_attacker = red_->GetNextAttacker();
+            if (red_attacker) {
+                IUnit* blue_target = blue_->GetUnit();
+                is_killed_blue = attack_facade_red.Attack(red_attacker, blue_target);
+                if (!is_killed_blue && blue_target->IsAlive()) {
+                    // Контратака синей команды
+                    IUnit* blue_attacker = blue_->GetNextAttacker();
+                    if (blue_attacker) {
+                        IUnit* red_target = red_->GetUnit();
+                        attack_facade_blue.Attack(blue_attacker, red_target);
+                    }
                 }
             }
-            // применяются специальные действия
-            SpecAction(red_, blue_, is_killed_red);
-            SpecAction(blue_, red_, is_killed_blue);
-        }
-        red_team_order_ = false;
-    } else {
-        // Атака синей команды
-        IUnit* blue_attacker = blue_->GetNextAttacker();
-        if (blue_attacker) {
-            IUnit* red_target = red_->GetUnit();
-            int is_killed_red = attack_facade_blue.Attack(blue_attacker, red_target);
-            int is_killed_blue{0};
-            if (!is_killed_red && red_target->IsAlive()) {
-                // Контратака красной команды
+        } else if (red_->GetFormation() == FormationType::LINE_ALL_ATTACK) {
+            int i = 0;
+            while (i++ < blue_->GetSize()) {
                 IUnit* red_attacker = red_->GetNextAttacker();
                 if (red_attacker) {
                     IUnit* blue_target = blue_->GetUnit();
-                    attack_facade_red.Attack(red_attacker, blue_target);
+                    is_killed_blue = attack_facade_red.Attack(red_attacker, blue_target);
+                    int is_killed_red{0};
+                    if (!is_killed_blue && blue_target->IsAlive()) {
+                        // Контратака синей команды
+                        IUnit* blue_attacker = blue_->GetNextAttacker();
+                        if (blue_attacker) {
+                            IUnit* red_target = red_->GetUnit();
+                            attack_facade_blue.Attack(blue_attacker, red_target);
+                        }
+                    }
                 }
             }
-
-            // Специальные действия
-            SpecAction(blue_, red_, is_killed_blue);
-            SpecAction(red_, blue_, is_killed_red);
         }
+        red_->ReSetCurrUnitInRow();
+        blue_->ReSetCurrUnitInRow();
+        // применяются специальные действия
+        SpecAction(red_, blue_, 0);
+        SpecAction(blue_, red_, is_killed_blue);
+        red_team_order_ = false;
+    } else {
+        // Атака синей команды
+        int is_killed_red = 0;
+        if (blue_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
+            IUnit* blue_attacker = blue_->GetNextAttacker();
+            if (blue_attacker) {
+                IUnit* red_target = red_->GetUnit();
+                is_killed_red = attack_facade_blue.Attack(blue_attacker, red_target);
+                int is_killed_blue{0};
+                if (!is_killed_red && red_target->IsAlive()) {
+                    // Контратака красной команды
+                    IUnit* red_attacker = red_->GetNextAttacker();
+                    if (red_attacker) {
+                        IUnit* blue_target = blue_->GetUnit();
+                        attack_facade_red.Attack(red_attacker, blue_target);
+                    }
+                }
+            }
+        } else if (blue_->GetFormation() == FormationType::LINE_ALL_ATTACK) {
+            int i = 0;
+            while (i++ < red_->GetSize()) {
+                IUnit* blue_attacker = blue_->GetNextAttacker();
+                if (blue_attacker) {
+                    IUnit* red_target = red_->GetUnit();
+                    is_killed_red = attack_facade_blue.Attack(blue_attacker, red_target);
+
+                    if (!is_killed_red && red_target->IsAlive()) {
+                        // Контратака красной команды
+                        IUnit* red_attacker = red_->GetNextAttacker();
+                        if (red_attacker) {
+                            IUnit* blue_target = blue_->GetUnit();
+                            attack_facade_red.Attack(red_attacker, blue_target);
+                        }
+                    }
+                }
+            }
+        }
+        red_->ReSetCurrUnitInRow();
+        blue_->ReSetCurrUnitInRow();
+        // Специальные действия
+        SpecAction(blue_, red_, 0);
+        SpecAction(red_, blue_, is_killed_red);
         red_team_order_ = true;
     }
 }

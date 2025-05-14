@@ -13,6 +13,7 @@ public:
     virtual bool HasNumber(IUnit* hero) const = 0;
     virtual unsigned int GetNumber(IUnit* hero) const = 0;
     virtual unsigned int AssignNumber(IUnit* hero) = 0;
+    virtual void RemoveHero(IUnit* hero) = 0;
 };
 
 class UnitNumberManager : public IUnitNumberManager {
@@ -33,7 +34,7 @@ public:
     unsigned int GetNumber(IUnit* hero) const;
 
     // Удалить героя из системы (но номер останется занятым)
-    inline void RemoveHero(IUnit* hero) {
+    void RemoveHero(IUnit* hero) {
         hero_numbers_.erase(hero);
     }
 

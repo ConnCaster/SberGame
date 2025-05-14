@@ -54,12 +54,18 @@ int UnitToUnitAttackMediator::Attack(IUnit* l, IUnit* r) {
         std::cout << "\tFINISH HIM!!!" << std::endl;
         std::string msg = "[" + r_team_->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " [index=" + std::to_string(r_team_->GetHeroNumber(r)) + "] was killed\n";
         logger_->AddLogMsg(msg, LogType::DEAD);
+        r_team_->RemoveUnit(r);
         delete r;
         was_smbd_killed = true;
         // return 1;
     } else {
         if (r) {
-            r_team_->ReturnUnit(r);
+            // if (r_team_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
+                r_team_->ReturnUnit(r);
+            // } else if (r_team_->GetFormation() == FormationType::LINE_ALL_ATTACK) {
+                // r_team_->ReturnUnitToPos(r, )
+            // }
+
         }
     }
     if (was_smbd_killed) {
