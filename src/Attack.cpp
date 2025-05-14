@@ -31,14 +31,19 @@ int UnitToUnitAttackMediator::Attack(IUnit* l, IUnit* r) {
     } else if ((ExtractTypeFromUnitPtr(l) == "Archer")) {
         std::cout << "Archer [index=" << l_team_->GetHeroNumber(l) << "] attacks... ";
 
-        r_team_->ReturnUnit(r);
-        IUnit* far_unit = r_team_->GetRandomUnit(dynamic_cast<Archer*>(l)->distance_);
-        if (far_unit) {
+        if (r_team_->GetFormation() == FormationType::LINE_ALL_ATTACK) {
             std::cout << ExtractTypeFromUnitPtr(r) << " [index=" << r_team_->GetHeroNumber(r) << "]" << std::endl;
-            dynamic_cast<Archer*>(l)->PerformAttack(far_unit);
-            r = far_unit;
-        } else {
-            std::cout << "Error getting enemy" << std::endl;
+            dynamic_cast<Archer*>(l)->PerformAttack(r);
+        } else if (r_team_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
+            r_team_->ReturnUnit(r);
+            IUnit* far_unit = r_team_->GetRandomUnit(dynamic_cast<Archer*>(l)->distance_);
+            if (far_unit) {
+                std::cout << ExtractTypeFromUnitPtr(r) << " [index=" << r_team_->GetHeroNumber(r) << "]" << std::endl;
+                dynamic_cast<Archer*>(l)->PerformAttack(far_unit);
+                r = far_unit;
+            } else {
+                std::cout << "Error getting enemy" << std::endl;
+            }
         }
 
     } else if ((ExtractTypeFromUnitPtr(l) == "Hiller")) {
@@ -49,7 +54,9 @@ int UnitToUnitAttackMediator::Attack(IUnit* l, IUnit* r) {
     } else if ((ExtractTypeFromUnitPtr(l) == "Wagenburg")) {
         std::cout << "Wagenburg [index=" << l_team_->GetHeroNumber(l) << "] does not have an attack ability" << std::endl;
     }
-    l_team_->ReturnUnit(l);
+    if (l_team_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
+        l_team_->ReturnUnit(l);
+    }
     if (r && r->GetHealth() == 0) {
         std::cout << "\tFINISH HIM!!!" << std::endl;
         std::string msg = "[" + r_team_->GetTeamName() + "] " + ExtractTypeFromUnitPtr(r) + " [index=" + std::to_string(r_team_->GetHeroNumber(r)) + "] was killed\n";
@@ -60,12 +67,9 @@ int UnitToUnitAttackMediator::Attack(IUnit* l, IUnit* r) {
         // return 1;
     } else {
         if (r) {
-            // if (r_team_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
+            if (r_team_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
                 r_team_->ReturnUnit(r);
-            // } else if (r_team_->GetFormation() == FormationType::LINE_ALL_ATTACK) {
-                // r_team_->ReturnUnitToPos(r, )
-            // }
-
+            }
         }
     }
     if (was_smbd_killed) {

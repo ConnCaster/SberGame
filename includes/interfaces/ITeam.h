@@ -19,6 +19,7 @@ public:
     virtual void ReturnUnit(IUnit* unit) = 0;
     virtual void ReturnUnitToPos(IUnit *unit, unsigned int pos) = 0;
     virtual IUnit* GetUnitByPos(unsigned int pos) = 0;
+    virtual IUnit* GetUnitByPosAndRemove(unsigned int pos) = 0;
     virtual void RemoveUnit(IUnit *unit) = 0;
 
     virtual void ReSetCurrUnitInRow() = 0;

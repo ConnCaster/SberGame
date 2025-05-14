@@ -26,7 +26,7 @@ public:
 
     // работа с командой юнитов: получение и возрат юнитов во время боя
     IUnit* GetUnit();  // удаляет игрока из команды
-    // IUnit* Team::GetUnitByPosAndRemove(); // удаляет из команды
+    IUnit* GetUnitByPosAndRemove(unsigned int pos); // удаляет из команды
     IUnit* GetRandomUnit(unsigned int distance = 0); // удаляет игрока из команды
     IUnit* GetUnitByPos(unsigned int pos);  // не удаляет игрока из команды
     void ReturnUnit(IUnit* unit);
@@ -65,21 +65,21 @@ public:
     }
 
 // Метод для получения следующего атакующего юнита
-    IUnit* GetNextAttacker() {
-        if (units_.empty()) return nullptr;
+    std::pair<IUnit*, int> GetNextAttacker() {
+        if (units_.empty()) return {nullptr, 0};
 
         switch(formation_) {
             case FormationType::LINE_FIRST_ONLY:
-                return GetUnit();
+                return {GetUnit(), 0};
 
             case FormationType::LINE_ALL_ATTACK: {
                 for (size_t i = 0; i < units_.size(); ++i) {
                     int current = (current_unit_in_row_++) % units_.size();
                     if (units_[current]->IsAlive()) {
-                        return units_[current];
+                        return {GetUnitByPosAndRemove(current), current};
                     }
                 }
-                return nullptr;
+                return {nullptr, 0};
             }
 
             case FormationType::COLUMN_OF_THREE: {
@@ -100,7 +100,7 @@ public:
                             IUnit* unit = units_[current_row_ * 3 + current_unit_in_row_];
                             current_unit_in_row_++;
                             if (unit->IsAlive()) {
-                                return unit;
+                                return {unit, 0};
                             }
                         }
 
@@ -115,11 +115,11 @@ public:
                 }
 
                 // Все шеренги мертвы
-                return nullptr;
+                return {nullptr, 0};
             }
         }
 
-        return nullptr;
+        return {nullptr, 0};
     }
 
 private:

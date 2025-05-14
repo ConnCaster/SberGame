@@ -5,7 +5,6 @@ Team::Team(const std::string& team_name)
 {}
 
 Team::~Team() {
-    // TODO: раскомментировать
     for (auto unit: units_) {
         delete unit;
     }
@@ -39,6 +38,14 @@ IUnit* Team::GetUnit() {
     return nullptr;
 }
 
+IUnit* Team::GetUnitByPosAndRemove(unsigned int pos) {
+    if (units_.empty()) return nullptr;
+    std::deque<IUnit*>::iterator it = units_.begin() + pos;
+    IUnit* unit = *it;
+    units_.erase(it);
+    return unit;
+}
+
 void Team::ReturnUnit(IUnit *unit) {
     for (auto cur_unit : units_) {
         if (cur_unit == unit) return;
@@ -47,12 +54,16 @@ void Team::ReturnUnit(IUnit *unit) {
 }
 
 void Team::ReturnUnitToPos(IUnit *unit, unsigned int pos) {
-    if (pos < 0 || pos >= GetSize()) return;
+    // if (pos < 0 || pos >= GetSize()) return;
     for (auto cur_unit : units_) {
         if (cur_unit == unit) return;
     }
     auto it_to_pos = units_.begin() + pos;
-    units_.insert(it_to_pos, unit);
+    if (pos >= GetSize()) {
+        units_.push_back(unit);
+    } else {
+        units_.insert(it_to_pos, unit);
+    }
 }
 
 void Team::ReplaceUnit(IUnit *unit, unsigned int pos) {
