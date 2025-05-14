@@ -135,35 +135,38 @@ void Game::Turn() {
             SpecAction(red_, blue_, 0);
             SpecAction(blue_, red_, is_killed_blue);
         } else if (red_->GetFormation() == FormationType::LINE_ALL_ATTACK) {
-            int i = 0;
-            while (i < blue_->GetSize()) {
-                IUnit* red_attacker = red_->GetUnitByPosAndRemove(i);
+            int blue_i = 0, red_j = 0;
+            while (blue_i < blue_->GetSize() && red_j < red_->GetSize()) {
+                std::cout << "[BLUE_OPPONENT] SIZE: " << blue_->GetSize() << std::endl;
+                IUnit* red_attacker = red_->GetUnitByPosAndRemove(red_j);
                 if (red_attacker) {
-                    IUnit* blue_target = blue_->GetUnitByPosAndRemove(i);
+                    IUnit* blue_target = blue_->GetUnitByPosAndRemove(blue_i);
                     is_killed_blue = attack_facade_red.Attack(red_attacker, blue_target);
-                    red_->ReturnUnitToPos(red_attacker, i);
+                    red_->ReturnUnitToPos(red_attacker, red_j);
                     if (!is_killed_blue && blue_target->IsAlive()) {
                         // Контратака синей команды
-                        blue_->ReturnUnitToPos(blue_target, i);
-                        IUnit* blue_attacker = blue_->GetUnitByPosAndRemove(i);
+                        blue_->ReturnUnitToPos(blue_target, blue_i);
+                        IUnit* blue_attacker = blue_->GetUnitByPosAndRemove(blue_i);
                         if (blue_attacker) {
-                            IUnit* red_target = red_->GetUnitByPosAndRemove(i);
+                            IUnit* red_target = red_->GetUnitByPosAndRemove(red_j);
                             bool is_killed_red_local = attack_facade_blue.Attack(blue_attacker, red_target);
-                            blue_->ReturnUnitToPos(blue_attacker, i);
+                            blue_->ReturnUnitToPos(blue_attacker, blue_i);
                             if (!is_killed_red_local && red_target->IsAlive()) {
-                                red_->ReturnUnitToPos(red_target, i);
+                                red_->ReturnUnitToPos(red_target, red_j);
+                            } else {
+                                red_j++;
                             }
                         }
+                    } else {
+                        blue_i++;
                     }
                 }
-                i++;
+                red_j++;
+                blue_i++;
             }
-            SpecAction(red_, blue_, 1);
-            SpecAction(blue_, red_, 1);
+            SpecAction(red_, blue_, 1, red_j);
+            SpecAction(blue_, red_, 1, blue_i);
         }
-        // применяются специальные действия
-        // SpecAction(red_, blue_, 0);
-        // SpecAction(blue_, red_, is_killed_blue);
         red_team_order_ = false;
     } else {
         // Атака синей команды
@@ -189,37 +192,39 @@ void Game::Turn() {
             SpecAction(blue_, red_, 0);
             SpecAction(red_, blue_, is_killed_red);
         } else if (blue_->GetFormation() == FormationType::LINE_ALL_ATTACK) {
-            int i = 0;
-            while (i < red_->GetSize()) {
-                IUnit* blue_attacker = blue_->GetUnitByPosAndRemove(i);
+            int blue_i = 0, red_j = 0;
+            while (blue_i < blue_->GetSize() && red_j < red_->GetSize()) {
+                std::cout << "[RED_OPPONENT] SIZE: " << red_->GetSize() << std::endl;
+                IUnit* blue_attacker = blue_->GetUnitByPosAndRemove(blue_i);
                 if (blue_attacker) {
-                    IUnit* red_target = red_->GetUnitByPosAndRemove(i);
+                    IUnit* red_target = red_->GetUnitByPosAndRemove(red_j);
                     is_killed_red = attack_facade_blue.Attack(blue_attacker, red_target);
-                    blue_->ReturnUnitToPos(blue_attacker, i);
+                    blue_->ReturnUnitToPos(blue_attacker, blue_i);
                     if (!is_killed_red && red_target->IsAlive()) {
                         // Контратака красной команды
-                        red_->ReturnUnitToPos(red_target, i);
-                        IUnit* red_attacker = red_->GetUnitByPosAndRemove(i);
+                        red_->ReturnUnitToPos(red_target, red_j);
+                        IUnit* red_attacker = red_->GetUnitByPosAndRemove(red_j);
                         if (red_attacker) {
-                            IUnit* blue_target = blue_->GetUnitByPosAndRemove(i);
+                            IUnit* blue_target = blue_->GetUnitByPosAndRemove(blue_i);
                             bool is_killed_blue_local = attack_facade_red.Attack(red_attacker, blue_target);
-                            red_->ReturnUnitToPos(red_attacker, i);
+                            red_->ReturnUnitToPos(red_attacker, red_j);
                             if (!is_killed_blue_local && blue_target->IsAlive()) {
-                                blue_->ReturnUnitToPos(blue_target, i);
+                                blue_->ReturnUnitToPos(blue_target, blue_i);
+                            } else {
+                                blue_i++;
                             }
                         }
+                    } else {
+                        red_j++;
                     }
                 }
-                i++;
+                red_j++;
+                blue_i++;
             }
             // Специальные действия
-            SpecAction(blue_, red_, 1);
-            SpecAction(red_, blue_, 1);
+            SpecAction(blue_, red_, 1, blue_i);
+            SpecAction(red_, blue_, 1, red_j);
         }
-
-        // Специальные действия
-        // SpecAction(blue_, red_, 0);
-        // SpecAction(red_, blue_, is_killed_red);
         red_team_order_ = true;
     }
 }
@@ -283,11 +288,11 @@ void Game::ShowGameResults() const {
     }
 }
 
-void Game::SpecAction(Team *l_team, Team *r_team, int was_killed) {
+void Game::SpecAction(Team *l_team, Team *r_team, int was_killed, int start_pos) {
     std::string msg = "\n[" + l_team->GetTeamName() + "] use SpecActions via [" + r_team->GetTeamName() + "]\n";
     std::cout << msg;
     logger_.AddLogMsg(msg, LogType::SPEC_ACT);
-    for (int i = (was_killed) ? 0 : 1; i < l_team->GetSize(); ++i) {
+    for (int i = (was_killed) ? 0+start_pos : 1+start_pos; i < l_team->GetSize(); ++i) {
         IUnit *unit = l_team->GetUnitByPos(i);
         // TODO: как применять специальные действия
         if (ExtractTypeFromUnitPtr(unit) == "HeavyHero") {
@@ -364,7 +369,10 @@ void Game::SpecAction(Team *l_team, Team *r_team, int was_killed) {
                 logger_.AddLogMsg(msg, LogType::SPEC_ACT);
                 IUnit *cloned_unit = dynamic_cast<Wizard *>(unit)->PerformSpecAction(unit_to_clone);
                 if (cloned_unit) {
-                    l_team->AddUnitToPos(cloned_unit, i++);
+                    l_team->AddUnitToPos(cloned_unit, pos);
+                    if (pos <= i) {
+                        i++;
+                    }
                 }
             }
         } else if (ExtractTypeFromUnitPtr(unit) == "Wagenburg") {

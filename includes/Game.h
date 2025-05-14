@@ -125,7 +125,7 @@ private:
     Team* CreateTeam(ITeamBuilder* team_builder);
 
 
-    void SpecAction(Team* l_team, Team* r_team, int was_killed);
+    void SpecAction(Team* l_team, Team* r_team, int was_killed, int start_pos=0);
 
     void ShowGameResults() const;
 

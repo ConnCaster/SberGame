@@ -54,7 +54,6 @@ void Team::ReturnUnit(IUnit *unit) {
 }
 
 void Team::ReturnUnitToPos(IUnit *unit, unsigned int pos) {
-    // if (pos < 0 || pos >= GetSize()) return;
     for (auto cur_unit : units_) {
         if (cur_unit == unit) return;
     }
