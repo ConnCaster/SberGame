@@ -24,6 +24,10 @@ public:
         };
     }
 
+    bool IsAlive() const {
+        return health_ > 0;
+    }
+
 protected:
     unsigned int health_;
     unsigned int protection_;

@@ -10,6 +10,12 @@
 #include "team/TeamIterator.h"
 #include "team/UnitNumberManager.h"
 
+enum class FormationType {
+    LINE_FIRST_ONLY,    // Линия, атакует только первый
+    LINE_ALL_ATTACK,    // Линия, атакуют все
+    COLUMN_OF_THREE     // Колонна по три
+};
+
 std::string ExtractTypeFromUnitPtr(IUnit* unit);
 
 class IUnitNumberManager;
@@ -46,10 +52,84 @@ public:
 
     std::vector<std::pair<IUnit*, unsigned int>> CheckIfHeavyHeroNeighbour(unsigned int pos) const;
 
+    void SetFormation(FormationType formation) {
+        formation_ = formation;
+        current_row_ = 0;
+        current_unit_in_row_ = 0;
+    }
+
+    FormationType GetFormation() const {
+        return formation_;
+    }
+
+// Метод для получения следующего атакующего юнита
+    IUnit* GetNextAttacker() {
+        if (units_.empty()) return nullptr;
+
+        switch(formation_) {
+            case FormationType::LINE_FIRST_ONLY:
+                return GetUnit();
+
+            case FormationType::LINE_ALL_ATTACK: {
+                static size_t current = 0;
+                for (size_t i = 0; i < units_.size(); ++i) {
+                    current = (current + 1) % units_.size();
+                    if (units_[current]->IsAlive()) {
+                        return units_[current];
+                    }
+                }
+                return nullptr;
+            }
+
+            case FormationType::COLUMN_OF_THREE: {
+                // Находим первую живую шеренгу
+                while (current_row_ * 3 < units_.size()) {
+                    // Проверяем, есть ли живые в текущей шеренге
+                    bool row_has_alive = false;
+                    for (int i = 0; i < 3 && (current_row_ * 3 + i) < units_.size(); ++i) {
+                        if (units_[current_row_ * 3 + i]->IsAlive()) {
+                            row_has_alive = true;
+                            break;
+                        }
+                    }
+
+                    if (row_has_alive) {
+                        // Ищем следующего живого в шеренге
+                        while (current_unit_in_row_ < 3 && (current_row_ * 3 + current_unit_in_row_) < units_.size()) {
+                            IUnit* unit = units_[current_row_ * 3 + current_unit_in_row_];
+                            current_unit_in_row_++;
+                            if (unit->IsAlive()) {
+                                return unit;
+                            }
+                        }
+
+                        // Переходим к началу шеренги для следующего хода
+                        current_unit_in_row_ = 0;
+                        return GetNextAttacker();
+                    } else {
+                        // Переходим к следующей шеренге
+                        current_row_++;
+                        current_unit_in_row_ = 0;
+                    }
+                }
+
+                // Все шеренги мертвы
+                return nullptr;
+            }
+        }
+
+        return nullptr;
+    }
+
 private:
     std::deque<IUnit*> units_;
     std::string team_name_;
 
     IUnitNumberManager* number_manager_;
+
+    // Для колонны по три
+    FormationType formation_;
+    int current_row_ = 0;
+    int current_unit_in_row_ = 0;
 };
 #endif //SBERGAME_TEAM_H

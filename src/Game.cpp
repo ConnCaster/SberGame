@@ -57,6 +57,28 @@ void Game::Run() {
         return;
     }
 
+
+    // Добавляем выбор построения
+    std::string formation;
+    std::cout << "Choose formation for teams [line_first/line_all/column_three]: ";
+    std::cin >> formation;
+
+    FormationType formation_type;
+    if (formation == "line_first") {
+        formation_type = FormationType::LINE_FIRST_ONLY;
+    } else if (formation == "line_all") {
+        formation_type = FormationType::LINE_ALL_ATTACK;
+    } else if (formation == "column_three") {
+        formation_type = FormationType::COLUMN_OF_THREE;
+    } else {
+        std::cout << "Unknown formation, using default (line_first)\n";
+        formation_type = FormationType::LINE_FIRST_ONLY;
+    }
+
+    // Устанавливаем построение
+    if (red_) red_->SetFormation(formation_type);
+    if (blue_) blue_->SetFormation(formation_type);
+
     std::string first_team{};
     ChooseFirstTurnTeam(first_team);
     red_team_order_ = (first_team == "red");
@@ -85,8 +107,8 @@ void Game::Run() {
 }
 
 void Game::Turn() {
-    IUnit *red_unit = red_->GetUnit();
-    IUnit *blue_unit = blue_->GetUnit();
+    // IUnit *red_unit = red_->GetUnit();
+    // IUnit *blue_unit = blue_->GetUnit();
     AttackMediator* attack_mediator_red_to_blue = new UnitToUnitAttackMediator(red_, blue_, &logger_);
     AttackMediator* attack_mediator_blue_to_red = new UnitToUnitAttackMediator(blue_, red_, &logger_);
 
@@ -95,31 +117,44 @@ void Game::Turn() {
 
     if (red_team_order_) {
         // герой красных наносит удар
-        int is_killed_blue = attack_facade_red.Attack(red_unit, blue_unit);
-        int is_killed_red{0};
-        if (!is_killed_blue) {
-            // если синий противник выжил, то он отвечает
-            red_unit = red_->GetUnit();
-            blue_unit = blue_->GetUnit();
-            is_killed_red = attack_facade_blue.Attack(blue_unit, red_unit);
+        IUnit* red_attacker = red_->GetNextAttacker();
+        if (red_attacker) {
+            IUnit* blue_target = blue_->GetUnit();
+            int is_killed_blue = attack_facade_red.Attack(red_attacker, blue_target);
+            int is_killed_red{0};
+            if (!is_killed_blue && blue_target->IsAlive()) {
+                // Контратака синей команды
+                IUnit* blue_attacker = blue_->GetNextAttacker();
+                if (blue_attacker) {
+                    IUnit* red_target = red_->GetUnit();
+                    attack_facade_blue.Attack(blue_attacker, red_target);
+                }
+            }
+            // применяются специальные действия
+            SpecAction(red_, blue_, is_killed_red);
+            SpecAction(blue_, red_, is_killed_blue);
         }
-        // применяются специальные действия
-        SpecAction(red_, blue_, is_killed_red);
-        SpecAction(blue_, red_, is_killed_blue);
         red_team_order_ = false;
     } else {
-        // герой синих наносит удар
-        int is_killed_red = attack_facade_blue.Attack(blue_unit, red_unit);
-        int is_killed_blue{0};
-        if (!is_killed_red) {
-            // если красный противник выжил, то он отвечает
-            red_unit = red_->GetUnit();
-            blue_unit = blue_->GetUnit();
-            is_killed_blue = attack_facade_red.Attack(red_unit, blue_unit);
+        // Атака синей команды
+        IUnit* blue_attacker = blue_->GetNextAttacker();
+        if (blue_attacker) {
+            IUnit* red_target = red_->GetUnit();
+            int is_killed_red = attack_facade_blue.Attack(blue_attacker, red_target);
+            int is_killed_blue{0};
+            if (!is_killed_red && red_target->IsAlive()) {
+                // Контратака красной команды
+                IUnit* red_attacker = red_->GetNextAttacker();
+                if (red_attacker) {
+                    IUnit* blue_target = blue_->GetUnit();
+                    attack_facade_red.Attack(red_attacker, blue_target);
+                }
+            }
+
+            // Специальные действия
+            SpecAction(blue_, red_, is_killed_blue);
+            SpecAction(red_, blue_, is_killed_red);
         }
-        // применяются специальные действия
-        SpecAction(blue_, red_, is_killed_blue);
-        SpecAction(red_, blue_, is_killed_red);
         red_team_order_ = true;
     }
 }

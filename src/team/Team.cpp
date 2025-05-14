@@ -13,7 +13,10 @@ Team::~Team() {
 
 Team::Team(const Team& other)
     : team_name_(other.team_name_),
-        number_manager_(other.number_manager_->DeepCopy())
+        number_manager_(other.number_manager_->DeepCopy()),
+        current_row_(other.current_row_),
+        current_unit_in_row_(other.current_unit_in_row_),
+        formation_(other.formation_)
 {
     for (const auto& unit : other.units_) {
         IUnit* new_unit = unit->DeepCopy();
