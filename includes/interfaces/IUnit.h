@@ -2,6 +2,8 @@
 #define SBERGAME_IUNIT_H
 
 #include <string>
+#include <vector>
+#include <algorithm>
 
 class IUnit {
 public:
@@ -16,7 +18,7 @@ public:
     virtual void DecreaseHealth(unsigned int damage) = 0;
     virtual unsigned int GetHealth() const { return health_; }
 
-    std::string GetInfo() const {
+    virtual std::string GetInfo() const {
         return {
            "Health: " + std::to_string(health_) + " "
            "Protection: " + std::to_string(protection_) + " "
@@ -24,7 +26,7 @@ public:
         };
     }
 
-    bool IsAlive() const {
+    virtual bool IsAlive() const {
         return health_ > 0;
     }
 
@@ -32,6 +34,21 @@ protected:
     unsigned int health_;
     unsigned int protection_;
     unsigned int damage_;
+};
+
+class CompositeUnit : public IUnit {
+public:
+    CompositeUnit();
+    void DecreaseHealth(unsigned int damage) override;
+    unsigned int GetHealth() const override;
+    std::string GetInfo() const override;
+    bool IsAlive() const override;
+    void AddUnit(IUnit* unit);
+    void RemoveUnit(IUnit* unit);
+    IUnit* DeepCopy() override;
+
+private:
+    std::vector<IUnit*> units_;
 };
 
 #endif

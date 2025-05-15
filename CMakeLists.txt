@@ -42,6 +42,7 @@ list(APPEND ${PROJECT_NAME}_SOURCES
         src/Game.cpp
         src/UnitFactory.cpp
         src/Attack.cpp
+        src/CompositeUnit.cpp
 
         src/logger/Logger.cpp
 
