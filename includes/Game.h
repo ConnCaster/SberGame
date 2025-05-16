@@ -30,6 +30,11 @@ public:
     virtual void SetBlueTeam(Team* team) = 0;
     virtual void SetRedTeamOrder(bool order) = 0;
 
+    virtual void RestoreInitialState() = 0;
+    virtual void SaveInitialState() = 0;
+
+    virtual CommandManager& GetCommandManager() = 0;
+
     virtual void SetState(std::unique_ptr<IGameState> new_state) = 0;
 };
 
@@ -70,9 +75,46 @@ private:
         bool red_team_order_copy;
         // и т.д.
     };
-
     GameState saved_state_;
 };
+
+class ResetToInitialCommand : public ICommand {
+public:
+    explicit ResetToInitialCommand(IGame& game) : game_(game) {}
+
+    void Execute() override {
+        // Сохраняем текущее состояние перед сбросом (для возможного Undo)
+        SaveState();
+        game_.RestoreInitialState();
+    }
+
+    void Undo() override {
+        // Восстанавливаем состояние перед сбросом
+        RestoreState();
+    }
+
+private:
+    void SaveState() {
+        saved_state_.red_team_copy = new Team(*game_.GetRedTeam());
+        saved_state_.blue_team_copy = new Team(*game_.GetBlueTeam());
+        saved_state_.red_team_order_copy = game_.GetRedTeamOrder();
+    }
+
+    void RestoreState() {
+        game_.SetRedTeam(saved_state_.red_team_copy);
+        game_.SetBlueTeam(saved_state_.blue_team_copy);
+        game_.SetRedTeamOrder(saved_state_.red_team_order_copy);
+    }
+
+    IGame& game_;
+    struct GameState {
+        Team* red_team_copy;
+        Team* blue_team_copy;
+        bool red_team_order_copy;
+    };
+    GameState saved_state_;
+};
+
 class Game;
 
 class IGameState {
@@ -119,6 +161,20 @@ public:
     void SetRedTeamOrder(bool order) override { red_team_order_ = order; }
     // void HandleInput(std::string& input);
 
+    void SaveInitialState() {
+        initial_state_.initial_red_team = new Team(*red_);
+        initial_state_.initial_blue_team = new Team(*blue_);
+        initial_state_.initial_red_team_order = red_team_order_;
+    }
+
+    void RestoreInitialState() {
+        SetRedTeam(new Team(*initial_state_.initial_red_team));
+        SetBlueTeam(new Team(*initial_state_.initial_blue_team));
+        SetRedTeamOrder(initial_state_.initial_red_team_order);
+    }
+
+    CommandManager& GetCommandManager() { return command_manager_; }
+
 private:
     int SetTeamGenerationType();
     unsigned int ChooseTeamBuilderType();
@@ -143,6 +199,12 @@ private:
 
     std::unique_ptr<IGameState> current_state_;
     CommandManager command_manager_{};
+    struct InitialGameState {
+        Team* initial_red_team;
+        Team* initial_blue_team;
+        bool initial_red_team_order;
+    };
+    InitialGameState initial_state_;
 };
 
 void ChooseFirstTurnTeam(std::string& first_team);

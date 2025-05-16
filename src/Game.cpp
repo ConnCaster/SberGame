@@ -57,6 +57,8 @@ void Game::Run() {
         return;
     }
 
+    // Сохраняем начальное состояние
+    SaveInitialState();
 
     // Добавляем выбор построения
     std::string formation;
@@ -89,7 +91,7 @@ void Game::Run() {
         if (current_state_) {
             current_state_->Update(*this);
 
-            std::cout << "Enter 'n' (next turn) or 'u' (undo turn): ";
+            std::cout << "Enter 'n' (next turn) or 'u' (undo turn) or 'r' (reset): ";
             std::string input;
             std::cin >> input;
             if (input == "u") {
@@ -419,11 +421,16 @@ void WaitingForInputState::HandleInput(Game &game, std::string &input) {
         if (!game.UndoLastTurn()) {
             std::cout << "Nothing to undo!" << std::endl;
         }
-        std::cout << "Enter 'n' for next turn or 'u' to undo last turn (max 3): ";
-        std::cin >> input;
-        HandleInput(game, input);
+    } else if (input == "r") {  // Добавляем команду для сброса
+        game.GetCommandManager().ExecuteCommand(new ResetToInitialCommand(game));
+        std::cout << "Game reset to initial state!" << std::endl;
+        std::cout << "=====================================" << std::endl;
     } else {
-        std::cout << "Error. Enter 'n' again: ";
+        std::cout << "Unknown command. Enter 'n' (next), 'u' (undo) or 'r' (reset): ";
+    }
+
+    if (input != "n") {  // Если не перешли в ProcessingState
+        std::cout << "Enter 'n' (next), 'u' (undo) or 'r' (reset): ";
         std::cin >> input;
         HandleInput(game, input);
     }
