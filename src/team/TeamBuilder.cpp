@@ -20,36 +20,17 @@ const std::map<std::string, unsigned int> kHeroCosts {
 constexpr unsigned int kMinUnitCost = 10;
 
 void TeamBuilderRandom::GenerateTeam() {
-    // Для колонны по три добавляем юнитов группами по три
-    if (team_->GetFormation() == FormationType::COLUMN_OF_THREE) {
-        while (team_cost_ <= (team_cost_max_ - kMinUnitCost * 3)) {
-            // Добавляем 3 юнита
-            int random_unit_idx = std::rand() % kHeroCosts.size();
-            auto it = kHeroCosts.begin();
-            std::advance(it, random_unit_idx);
-            unsigned int unit_cost = it->second * 3;
-
-            if (team_cost_ + unit_cost > team_cost_max_) continue;
-
-            for (int i = 0; i < 3; ++i) {
-                IUnit* unit = UnitFactory::CreateUnit(it->first);
-                team_->AddUnit(unit);
-            }
-            team_cost_ += unit_cost;
+    while (team_cost_ <= (team_cost_max_ - kMinUnitCost)) {
+        int random_unit_idx = std::rand() % kHeroCosts.size();
+        auto it = kHeroCosts.begin();
+        std::advance(it, random_unit_idx);
+        unsigned int unit_cost = it->second;
+        if (team_cost_ + unit_cost > team_cost_max_) {
+            continue;
         }
-    } else {
-        while (team_cost_ <= (team_cost_max_ - kMinUnitCost)) {
-            int random_unit_idx = std::rand() % kHeroCosts.size();
-            auto it = kHeroCosts.begin();
-            std::advance(it, random_unit_idx);
-            unsigned int unit_cost = it->second;
-            if (team_cost_ + unit_cost > team_cost_max_) {
-                continue;
-            }
-            IUnit* unit = UnitFactory::CreateUnit(it->first);
-            team_->AddUnit(unit);
-            team_cost_ += unit_cost;
-        }
+        IUnit* unit = UnitFactory::CreateUnit(it->first);
+        team_->AddUnit(unit);
+        team_cost_ += unit_cost;
     }
 }
 

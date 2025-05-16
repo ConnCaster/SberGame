@@ -63,65 +63,6 @@ public:
     void ReSetCurrUnitInRow() override {
         current_unit_in_row_ = 0;
     }
-
-// Метод для получения следующего атакующего юнита
-    std::pair<IUnit*, int> GetNextAttacker() {
-        if (units_.empty()) return {nullptr, 0};
-
-        switch(formation_) {
-            case FormationType::LINE_FIRST_ONLY:
-                return {GetUnit(), 0};
-
-            case FormationType::LINE_ALL_ATTACK: {
-                for (size_t i = 0; i < units_.size(); ++i) {
-                    int current = (current_unit_in_row_++) % units_.size();
-                    if (units_[current]->IsAlive()) {
-                        return {GetUnitByPosAndRemove(current), current};
-                    }
-                }
-                return {nullptr, 0};
-            }
-
-            case FormationType::COLUMN_OF_THREE: {
-                // Находим первую живую шеренгу
-                while (current_row_ * 3 < units_.size()) {
-                    // Проверяем, есть ли живые в текущей шеренге
-                    bool row_has_alive = false;
-                    for (int i = 0; i < 3 && (current_row_ * 3 + i) < units_.size(); ++i) {
-                        if (units_[current_row_ * 3 + i]->IsAlive()) {
-                            row_has_alive = true;
-                            break;
-                        }
-                    }
-
-                    if (row_has_alive) {
-                        // Ищем следующего живого в шеренге
-                        while (current_unit_in_row_ < 3 && (current_row_ * 3 + current_unit_in_row_) < units_.size()) {
-                            IUnit* unit = units_[current_row_ * 3 + current_unit_in_row_];
-                            current_unit_in_row_++;
-                            if (unit->IsAlive()) {
-                                return {unit, 0};
-                            }
-                        }
-
-                        // Переходим к началу шеренги для следующего хода
-                        current_unit_in_row_ = 0;
-                        return GetNextAttacker();
-                    } else {
-                        // Переходим к следующей шеренге
-                        current_row_++;
-                        current_unit_in_row_ = 0;
-                    }
-                }
-
-                // Все шеренги мертвы
-                return {nullptr, 0};
-            }
-        }
-
-        return {nullptr, 0};
-    }
-
 private:
     std::deque<IUnit*> units_;
     std::string team_name_;

@@ -60,7 +60,7 @@ void Game::Run() {
 
     // Добавляем выбор построения
     std::string formation;
-    std::cout << "Choose formation for teams [line_first/line_all/column_three]: ";
+    std::cout << "Choose formation for teams [line_first/line_all/column]: ";
     std::cin >> formation;
 
     FormationType formation_type;
@@ -68,8 +68,8 @@ void Game::Run() {
         formation_type = FormationType::LINE_FIRST_ONLY;
     } else if (formation == "line_all") {
         formation_type = FormationType::LINE_ALL_ATTACK;
-    } else if (formation == "column_three") {
-        formation_type = FormationType::COLUMN_OF_THREE;
+    } else if (formation == "column") {
+        formation_type = FormationType::COLUMN;
     } else {
         std::cout << "Unknown formation, using default (line_first)\n";
         formation_type = FormationType::LINE_FIRST_ONLY;
@@ -119,13 +119,15 @@ void Game::Turn() {
         // герой красных наносит удар
         int is_killed_blue = 0;
         if (red_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
-            auto [red_attacker, pos] = red_->GetNextAttacker();
+            // auto [red_attacker, pos] = red_->GetNextAttacker();
+            IUnit* red_attacker = red_->GetUnit();
             if (red_attacker) {
                 IUnit* blue_target = blue_->GetUnit();
                 is_killed_blue = attack_facade_red.Attack(red_attacker, blue_target);
                 if (!is_killed_blue && blue_target->IsAlive()) {
                     // Контратака синей команды
-                    auto [blue_attacker, pos] = blue_->GetNextAttacker();
+                    // auto [blue_attacker, pos] = blue_->GetNextAttacker();
+                    IUnit* blue_attacker = blue_->GetUnit();
                     if (blue_attacker) {
                         IUnit* red_target = red_->GetUnit();
                         attack_facade_blue.Attack(blue_attacker, red_target);
@@ -172,19 +174,19 @@ void Game::Turn() {
         // Атака синей команды
         int is_killed_red = 0;
         if (blue_->GetFormation() == FormationType::LINE_FIRST_ONLY) {
-            auto [blue_attacker, pos] = blue_->GetNextAttacker();
+            // auto [blue_attacker, pos] = blue_->GetNextAttacker();
+            IUnit* blue_attacker = blue_->GetUnit();
             if (blue_attacker) {
                 IUnit* red_target = red_->GetUnit();
                 is_killed_red = attack_facade_blue.Attack(blue_attacker, red_target);
-                blue_->ReturnUnitToPos(blue_attacker, pos);
                 int is_killed_blue{0};
                 if (!is_killed_red && red_target->IsAlive()) {
                     // Контратака красной команды
-                    auto [red_attacker, pos] = red_->GetNextAttacker();
+                    // auto [red_attacker, pos] = red_->GetNextAttacker();
+                    IUnit* red_attacker = red_->GetUnit();
                     if (red_attacker) {
                         IUnit* blue_target = blue_->GetUnit();
                         attack_facade_red.Attack(red_attacker, blue_target);
-                        red_->ReturnUnitToPos(red_attacker, pos);
                     }
                 }
             }

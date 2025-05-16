@@ -6,7 +6,7 @@
 enum class FormationType {
     LINE_FIRST_ONLY,    // Линия, атакует только первый
     LINE_ALL_ATTACK,    // Линия, атакуют все
-    COLUMN_OF_THREE     // Колонна по три
+    COLUMN     // Колонна по три
 };
 
 
