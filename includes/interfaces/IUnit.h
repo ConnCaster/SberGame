@@ -36,6 +36,7 @@ protected:
     unsigned int damage_;
 };
 
+// @brief Pattern Composite
 class CompositeUnit : public IUnit {
 public:
     CompositeUnit();

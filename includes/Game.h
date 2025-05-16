@@ -12,6 +12,13 @@ enum class GameMode: int {
     FastRun = 2
 };
 
+enum class GameRuntimeState: int {
+    FIRST_RUN = 1,
+    RESTARTED = 2,
+    IN_PROGRESS = 3,
+    FINISH = 4
+};
+
 class IGameState;
 
 class IGame {
@@ -192,19 +199,22 @@ private:
     Team* blue_;
     ITeamBuilder* red_team_builder_;
     ITeamBuilder* blue_team_builder_;
+    std::unique_ptr<IGameState> current_state_;
 
-    LogMsgHandler logger_;
+    LogMsgHandler logger_{};
 
     bool red_team_order_ = true;
+    GameRuntimeState start_game_from_beginning = GameRuntimeState::FIRST_RUN;
 
-    std::unique_ptr<IGameState> current_state_;
     CommandManager command_manager_{};
     struct InitialGameState {
         Team* initial_red_team;
         Team* initial_blue_team;
         bool initial_red_team_order;
     };
-    InitialGameState initial_state_;
+    InitialGameState initial_state_{};
+
+
 };
 
 void ChooseFirstTurnTeam(std::string& first_team);

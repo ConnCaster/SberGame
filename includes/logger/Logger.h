@@ -27,6 +27,9 @@ public:
 // @brief Pattern Observer
 class LogMessage {
 public:
+
+    ~LogMessage() = default;
+
     void Attach(LogType log_type, ILogger* logger) {
         observed_loggers_[log_type] = logger;
         log_messages_[log_type] = {};
@@ -35,8 +38,6 @@ public:
 
     void SetLogMessage(const std::string& log_msg, LogType log_type) {
         log_messages_[log_type].push_back(log_msg);
-        // log_msg_ = log_msg;
-        // NotifyLoggers(log_type);
     }
 
     void ExecLog(LogType log_type, LogMode log_mode) {
@@ -130,9 +131,9 @@ private:
     }
 
 private:
-    std::unordered_map<LogType, ILogger*> observed_loggers_;
-    std::unordered_map<LogType, std::vector<std::string>> log_messages_;
-    std::unordered_map<LogType, int> log_idxs_;
+    std::unordered_map<LogType, ILogger*> observed_loggers_{};
+    std::unordered_map<LogType, std::vector<std::string>> log_messages_{};
+    std::unordered_map<LogType, int> log_idxs_{};
 };
 
 class FileLogger : public ILogger {
@@ -175,6 +176,8 @@ private:
 class LogMsgHandler {
 public:
     LogMsgHandler();
+
+    void ResetLogger();
 
     void AddLogMsg(const std::string& msg, LogType log_type);
     void ExecLog(LogType log_type);

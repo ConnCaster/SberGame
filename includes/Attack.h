@@ -5,6 +5,7 @@
 #include "interfaces/ITeam.h"
 #include "logger/Logger.h"
 
+// @brief Pattern AttackMediator
 class AttackMediator {
 public:
     virtual int Attack(IUnit* l, IUnit* r) = 0;

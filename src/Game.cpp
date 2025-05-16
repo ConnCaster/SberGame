@@ -9,7 +9,6 @@ Game::Game()
       blue_{nullptr},
       red_team_builder_{nullptr},
       blue_team_builder_{nullptr},
-      logger_{},
       current_state_{nullptr} {
 }
 
@@ -44,73 +43,87 @@ GameMode ChooseGameMode() {
 
 
 void Game::Run() {
-    SetTeamGenerationType();
-    std::cout << "\n==== Start game ====\n";
-    red_ = CreateTeam(red_team_builder_);
-    if (!red_) {
-        std::cout << "Error while creating team. Abort..." << std::endl;
-        return;
-    }
-    blue_ = CreateTeam(blue_team_builder_);
-    if (!blue_) {
-        std::cout << "Error while creating team. Abort..." << std::endl;
-        return;
-    }
+    while (start_game_from_beginning == GameRuntimeState::FIRST_RUN ||
+        start_game_from_beginning == GameRuntimeState::RESTARTED) {
 
-    // Сохраняем начальное состояние
-    SaveInitialState();
+        if (start_game_from_beginning == GameRuntimeState::RESTARTED) {
+            logger_.ResetLogger();
+        }
+        start_game_from_beginning = GameRuntimeState::IN_PROGRESS;
 
-    // Добавляем выбор построения
-    std::string formation;
-    std::cout << "Choose formation for teams [line_first/line_all/column]: ";
-    std::cin >> formation;
+        SetTeamGenerationType();
+        std::cout << "\n==== Start game ====\n";
+        red_ = CreateTeam(red_team_builder_);
+        if (!red_) {
+            std::cout << "Error while creating team. Abort..." << std::endl;
+            return;
+        }
+        blue_ = CreateTeam(blue_team_builder_);
+        if (!blue_) {
+            std::cout << "Error while creating team. Abort..." << std::endl;
+            return;
+        }
 
-    FormationType formation_type;
-    if (formation == "line_first") {
-        formation_type = FormationType::LINE_FIRST_ONLY;
-    } else if (formation == "line_all") {
-        formation_type = FormationType::LINE_ALL_ATTACK;
-    } else if (formation == "column") {
-        formation_type = FormationType::COLUMN;
-    } else {
-        std::cout << "Unknown formation, using default (line_first)\n";
-        formation_type = FormationType::LINE_FIRST_ONLY;
-    }
+        // Добавляем выбор построения
+        std::string formation;
+        std::cout << "Choose formation for teams [line_first/line_all/column]: ";
+        std::cin >> formation;
 
-    // Устанавливаем построение
-    if (red_) red_->SetFormation(formation_type);
-    if (blue_) blue_->SetFormation(formation_type);
+        FormationType formation_type;
+        if (formation == "line_first") {
+            formation_type = FormationType::LINE_FIRST_ONLY;
+        } else if (formation == "line_all") {
+            formation_type = FormationType::LINE_ALL_ATTACK;
+        } else if (formation == "column") {
+            formation_type = FormationType::COLUMN;
+        } else {
+            std::cout << "Unknown formation, using default (line_first)\n";
+            formation_type = FormationType::LINE_FIRST_ONLY;
+        }
 
-    std::string first_team{};
-    ChooseFirstTurnTeam(first_team);
-    red_team_order_ = (first_team == "red");
+        // Устанавливаем построение
+        if (red_) red_->SetFormation(formation_type);
+        if (blue_) blue_->SetFormation(formation_type);
 
-    current_state_ = (ChooseGameMode() == GameMode::StepByStep) ? IGameState::CreateWaitingState() : nullptr;
-    while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
-        std::cout << "=====================================" << std::endl;
-        if (current_state_) {
-            current_state_->Update(*this);
+        std::string first_team{};
+        ChooseFirstTurnTeam(first_team);
+        red_team_order_ = (first_team == "red");
 
-            std::cout << "Enter 'n' (next turn) or 'u' (undo turn) or 'r' (reset): ";
-            std::string input;
-            std::cin >> input;
-            if (input == "u") {
-                if (!UndoLastTurn()) {
-                    std::cout << "Nothing to undo!" << std::endl;
+        // Сохраняем начальное состояние
+        SaveInitialState();
+
+        current_state_ = (ChooseGameMode() == GameMode::StepByStep) ? IGameState::CreateWaitingState() : nullptr;
+        while (red_ && blue_ && !red_->IsEmpty() && !blue_->IsEmpty()) {
+            std::cout << "=====================================" << std::endl;
+            if (current_state_) {
+                current_state_->Update(*this);
+
+                std::cout << "Enter: \n\t'n' (next turn) or \n\t'u' (undo turn) or \n\t'r' (reset fight) or \n\t'e' (exit to new game): ";
+                std::string input;
+                std::cin >> input;
+                if (input == "e") {
+                    start_game_from_beginning = GameRuntimeState::RESTARTED;
+                    break;
+                }
+                if (input == "u") {
+                    if (!UndoLastTurn()) {
+                        std::cout << "Nothing to undo!" << std::endl;
+                    }
+                } else {
+                    current_state_->HandleInput(*this, input);
                 }
             } else {
-                current_state_->HandleInput(*this, input);
+                ProcessTurnLogic();
             }
-        } else {
-            ProcessTurnLogic();
+        }
+        if (start_game_from_beginning != GameRuntimeState::RESTARTED) {
+            start_game_from_beginning = GameRuntimeState::FINISH;
+            ShowGameResults();
         }
     }
-    ShowGameResults();
 }
 
 void Game::Turn() {
-    // IUnit *red_unit = red_->GetUnit();
-    // IUnit *blue_unit = blue_->GetUnit();
     AttackMediator* attack_mediator_red_to_blue = new UnitToUnitAttackMediator(red_, blue_, &logger_);
     AttackMediator* attack_mediator_blue_to_red = new UnitToUnitAttackMediator(blue_, red_, &logger_);
 
@@ -426,11 +439,11 @@ void WaitingForInputState::HandleInput(Game &game, std::string &input) {
         std::cout << "Game reset to initial state!" << std::endl;
         std::cout << "=====================================" << std::endl;
     } else {
-        std::cout << "Unknown command. Enter 'n' (next), 'u' (undo) or 'r' (reset): ";
+        std::cout << "Unknown command. Enter 'n' (next), 'u' (undo) or 'r' (reset fight): ";
     }
 
     if (input != "n") {  // Если не перешли в ProcessingState
-        std::cout << "Enter 'n' (next), 'u' (undo) or 'r' (reset): ";
+        std::cout << "Enter 'n' (next), 'u' (undo) or 'r' (reset fight): ";
         std::cin >> input;
         HandleInput(game, input);
     }
